@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin Login</title>
+  <link rel="icon" href="/favicon.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body class="login-body">
+  <div class="login-bg" aria-hidden="true"><span></span><span></span></div>
+  <main class="login-card">
+    <div class="login-logo" id="login-logo"></div>
+    <h1>Welcome back</h1>
+    <p class="sub">Sign in to manage your portfolio</p>
+    <form id="login-form" novalidate>
+      <label class="f">
+        <span>Email</span>
+        <div class="input-icon"><i id="ic-mail"></i><input type="email" id="email" autocomplete="username" required placeholder="you@example.com" /></div>
+      </label>
+      <label class="f">
+        <span>Password</span>
+        <div class="input-icon"><i id="ic-lock"></i><input type="password" id="password" autocomplete="current-password" required placeholder="••••••••" />
+          <button type="button" class="eye" id="toggle-pw" aria-label="Show password"></button></div>
+      </label>
+      <p class="login-error" id="login-error" role="alert"></p>
+      <button class="a-btn primary block" type="submit" id="login-btn">Sign in</button>
+    </form>
+    <a href="/" class="back-link">← Back to website</a>
+  </main>
+  <script src="/js/icons.js"></script>
+  <script>
+    (function () {
+      var I = window.Icons;
+      document.getElementById('login-logo').innerHTML = I.ui('lock');
+      document.getElementById('ic-mail').innerHTML = I.ui('mail');
+      document.getElementById('ic-lock').innerHTML = I.ui('lock');
+      var pw = document.getElementById('password');
+      var eye = document.getElementById('toggle-pw');
+      eye.innerHTML = I.ui('eye');
+      eye.onclick = function () { pw.type = pw.type === 'password' ? 'text' : 'password'; };
+
+      // already logged in? go straight to the dashboard
+      var t = localStorage.getItem('pf-admin-token');
+      if (t) fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + t } }).then(function (r) { if (r.ok) location.replace('/admin'); });
+
+      var form = document.getElementById('login-form');
+      var err = document.getElementById('login-error');
+      var btn = document.getElementById('login-btn');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        err.textContent = '';
+        var email = document.getElementById('email').value.trim();
+        if (!email || !pw.value) { err.textContent = 'Please enter your email and password.'; return; }
+        btn.disabled = true; btn.textContent = 'Signing in…';
+        fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, password: pw.value }) })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            if (!res.ok) throw new Error(res.j.error || 'Login failed');
+            localStorage.setItem('pf-admin-token', res.j.token);
+            location.replace('/admin');
+          })
+          .catch(function (e2) { err.textContent = e2.message; form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake'); })
+          .finally(function () { btn.disabled = false; btn.textContent = 'Sign in'; });
+      });
+    })();
+  </script>
+</body>
+</html>

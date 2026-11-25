@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{THEME_MODE}}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{TITLE}}</title>
+  <meta name="description" content="{{DESCRIPTION}}" />
+  <meta name="keywords" content="{{KEYWORDS}}" />
+  <meta property="og:title" content="{{TITLE}}" />
+  <meta property="og:description" content="{{DESCRIPTION}}" />
+  <meta property="og:image" content="{{OG_IMAGE}}" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="{{FAVICON}}" id="favicon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" id="font-link" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script>/*{{CONTENT}}*/</script>
+  <script>
+    // apply the visitor's saved light/dark choice before paint
+    try { var m = localStorage.getItem('pf-theme'); if (m && window.__CONTENT__ && window.__CONTENT__.theme.allowVisitorToggle) document.documentElement.dataset.theme = m; } catch (e) {}
+  </script>
+</head>
+<body>
+  <div class="bg-fx" aria-hidden="true"><div class="bg-grid"></div><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="#hero" class="logo" id="logo"></a>
+      <nav class="nav-links" id="nav-links" aria-label="Main"></nav>
+      <div class="nav-actions">
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle light/dark mode"></button>
+        <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false"></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main"></main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <a href="#hero" class="logo" id="footer-logo"></a>
+        <p class="muted" id="footer-text"></p>
+      </div>
+      <div class="socials" id="footer-socials"></div>
+    </div>
+    <div class="container footer-bottom">
+      <span id="copyright"></span>
+      <a href="/admin" class="admin-link" id="admin-link" hidden>Admin</a>
+    </div>
+  </footer>
+
+  <button class="to-top" id="to-top" aria-label="Back to top"></button>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview" hidden>
+    <button class="icon-btn lb-close" id="lb-close" aria-label="Close"></button>
+    <img id="lb-img" alt="" />
+    <p id="lb-caption"></p>
+  </div>
+
+  <script src="/js/icons.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

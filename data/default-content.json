@@ -1,0 +1,230 @@
+{
+  "site": {
+    "title": "Aarav — Coder & Developer",
+    "description": "Portfolio of Aarav, a young coder and developer who builds websites, apps, bots and digital products.",
+    "keywords": "Aarav, developer, coder, portfolio, web developer, India",
+    "logoText": "aarav",
+    "logoImage": "",
+    "favicon": "/favicon.png",
+    "ogImage": "/assets/avatar.jpg",
+    "footerText": "Designed & built with lots of chai and code.",
+    "showAdminLink": false
+  },
+  "theme": {
+    "mode": "dark",
+    "allowVisitorToggle": true,
+    "primary": "#8b5cf6",
+    "secondary": "#22d3ee",
+    "accent": "#f472b6",
+    "background": "#07060f",
+    "surface": "#12111f",
+    "text": "#ece9ff",
+    "muted": "#9a96b8",
+    "lightBackground": "#f7f6fc",
+    "lightSurface": "#ffffff",
+    "lightText": "#15122b",
+    "lightMuted": "#5d5a78",
+    "fontHeading": "Space Grotesk",
+    "fontBody": "Inter",
+    "radius": 18,
+    "animations": true,
+    "cursorGlow": true,
+    "backgroundGrid": true
+  },
+  "sections": [
+    { "id": "hero", "label": "Home", "enabled": true },
+    { "id": "about", "label": "About", "enabled": true },
+    { "id": "skills", "label": "Skills", "enabled": true },
+    { "id": "projects", "label": "Projects", "enabled": true },
+    { "id": "products", "label": "Products", "enabled": true },
+    { "id": "experience", "label": "Journey", "enabled": true },
+    { "id": "gallery", "label": "Gallery", "enabled": true },
+    { "id": "testimonials", "label": "Testimonials", "enabled": true },
+    { "id": "contact", "label": "Contact", "enabled": true }
+  ],
+  "hero": {
+    "greeting": "Hey there, I'm",
+    "name": "Aarav",
+    "roles": ["Full-Stack Developer", "App Builder", "Bot Maker", "Creator"],
+    "tagline": "I turn ideas into fast, beautiful websites, apps and tools. Coding since I was a kid — building things people actually use.",
+    "avatar": "/assets/avatar.jpg",
+    "backgroundImage": "",
+    "availableBadge": true,
+    "availableText": "Available for freelance work",
+    "primaryButtonText": "See my work",
+    "primaryButtonLink": "#projects",
+    "secondaryButtonText": "Contact me",
+    "secondaryButtonLink": "#contact",
+    "showSocials": true
+  },
+  "about": {
+    "heading": "About me",
+    "subheading": "A little bit about who I am",
+    "bio": "I'm Aarav, a self-taught coder and developer from India. I love building things on the internet — from slick websites and web apps to Discord bots and automation tools.\n\nWhen I'm not coding, you'll find me sharing my builds on Instagram, learning new tech, gaming, or planning my next big project.",
+    "photo": "/assets/avatar.jpg",
+    "location": "Delhi, India",
+    "resumeText": "Download CV",
+    "resumeLink": "",
+    "stats": [
+      { "value": "3+", "label": "Years coding" },
+      { "value": "25+", "label": "Projects built" },
+      { "value": "10+", "label": "Happy clients" },
+      { "value": "∞", "label": "Cups of chai" }
+    ]
+  },
+  "skills": {
+    "heading": "Skills & tools",
+    "subheading": "The tech I use to bring ideas to life",
+    "items": [
+      { "name": "HTML & CSS", "level": 95, "category": "Frontend" },
+      { "name": "JavaScript", "level": 90, "category": "Frontend" },
+      { "name": "React / Next.js", "level": 82, "category": "Frontend" },
+      { "name": "Tailwind CSS", "level": 88, "category": "Frontend" },
+      { "name": "Node.js & Express", "level": 85, "category": "Backend" },
+      { "name": "Python", "level": 80, "category": "Backend" },
+      { "name": "MongoDB / SQL", "level": 75, "category": "Backend" },
+      { "name": "Git & GitHub", "level": 88, "category": "Tools" },
+      { "name": "Figma", "level": 70, "category": "Tools" },
+      { "name": "Discord.js", "level": 85, "category": "Tools" }
+    ]
+  },
+  "projects": {
+    "heading": "Featured projects",
+    "subheading": "Some things I've designed and built",
+    "items": [
+      {
+        "title": "Nebula Dashboard",
+        "description": "A real-time analytics dashboard with beautiful charts, dark mode and role-based access.",
+        "image": "/assets/project-1.jpg",
+        "tags": ["React", "Node.js", "MongoDB"],
+        "liveUrl": "https://example.com",
+        "codeUrl": "https://github.com/",
+        "featured": true
+      },
+      {
+        "title": "Chatly",
+        "description": "A fast, minimal chat app with rooms, typing indicators and image sharing.",
+        "image": "/assets/project-2.jpg",
+        "tags": ["Socket.io", "Express", "PWA"],
+        "liveUrl": "https://example.com",
+        "codeUrl": "https://github.com/",
+        "featured": false
+      },
+      {
+        "title": "Study Buddy AI",
+        "description": "An AI helper that explains concepts, makes quizzes and summarizes notes for students.",
+        "image": "/assets/project-3.jpg",
+        "tags": ["Python", "AI", "Next.js"],
+        "liveUrl": "",
+        "codeUrl": "https://github.com/",
+        "featured": false
+      }
+    ]
+  },
+  "products": {
+    "heading": "My products",
+    "subheading": "Templates, tools and resources I've made for you",
+    "items": [
+      {
+        "name": "Starter Website Pack",
+        "description": "10 modern, responsive landing page templates. Copy, paste, launch.",
+        "image": "/assets/product-1.jpg",
+        "price": "₹499",
+        "badge": "Bestseller",
+        "buttonText": "Get it",
+        "link": "https://example.com"
+      },
+      {
+        "name": "Custom Discord Bot",
+        "description": "Moderation, music, levels and custom commands — built just for your server.",
+        "image": "/assets/product-2.jpg",
+        "price": "From ₹999",
+        "badge": "Service",
+        "buttonText": "Order now",
+        "link": "#contact"
+      },
+      {
+        "name": "Code From Zero (E-book)",
+        "description": "My beginner-friendly guide to learning web development from scratch.",
+        "image": "/assets/product-3.jpg",
+        "price": "Free",
+        "badge": "New",
+        "buttonText": "Download",
+        "link": "https://example.com"
+      }
+    ]
+  },
+  "experience": {
+    "heading": "My journey",
+    "subheading": "How I got here",
+    "items": [
+      {
+        "period": "2026 — Now",
+        "role": "Freelance Developer",
+        "company": "Self-employed",
+        "description": "Building websites, bots and tools for creators and small businesses."
+      },
+      {
+        "period": "2025",
+        "role": "Open-source Contributor",
+        "company": "GitHub",
+        "description": "Contributed fixes and features to open-source JavaScript projects."
+      },
+      {
+        "period": "2023",
+        "role": "Wrote my first line of code",
+        "company": "Hello, World!",
+        "description": "Started with HTML & CSS, fell in love with building things, never stopped."
+      }
+    ]
+  },
+  "gallery": {
+    "heading": "Gallery",
+    "subheading": "Moments, setups and builds — follow along on Instagram",
+    "instagramHandle": "@aarav",
+    "instagramUrl": "https://instagram.com/",
+    "items": [
+      { "image": "/assets/avatar.jpg", "caption": "That's me 👋", "link": "" },
+      { "image": "/assets/project-1.jpg", "caption": "Dashboard build", "link": "" },
+      { "image": "/assets/project-2.jpg", "caption": "Chat app in progress", "link": "" },
+      { "image": "/assets/product-2.jpg", "caption": "Bot mascot", "link": "" },
+      { "image": "/assets/project-3.jpg", "caption": "Playing with AI", "link": "" },
+      { "image": "/assets/product-3.jpg", "caption": "Writing my e-book", "link": "" }
+    ]
+  },
+  "testimonials": {
+    "heading": "Kind words",
+    "subheading": "What people say about working with me",
+    "items": [
+      {
+        "name": "Rohan S.",
+        "role": "YouTuber",
+        "quote": "Aarav built my channel website in two days and it looks insane. Super quick replies too!",
+        "avatar": ""
+      },
+      {
+        "name": "Priya K.",
+        "role": "Discord community owner",
+        "quote": "The custom bot runs our whole server now. Really professional work.",
+        "avatar": ""
+      }
+    ]
+  },
+  "contact": {
+    "heading": "Let's build something",
+    "subheading": "Got a project, idea or just want to say hi? My inbox is always open.",
+    "email": "hello@example.com",
+    "phone": "",
+    "whatsapp": "",
+    "location": "Delhi, India",
+    "formEnabled": true,
+    "successMessage": "Thanks! Your message has been sent — I'll get back to you soon."
+  },
+  "socials": [
+    { "platform": "instagram", "label": "Instagram", "url": "https://instagram.com/" },
+    { "platform": "github", "label": "GitHub", "url": "https://github.com/aaravgyt782013-netizen" },
+    { "platform": "youtube", "label": "YouTube", "url": "https://youtube.com/" },
+    { "platform": "linkedin", "label": "LinkedIn", "url": "https://linkedin.com/" },
+    { "platform": "discord", "label": "Discord", "url": "https://discord.com/" }
+  ]
+}
