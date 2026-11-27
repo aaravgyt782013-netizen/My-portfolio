@@ -596,7 +596,7 @@ a.info-card:hover { border-color: var(--primary); transform: translateX(4px); }
 .ii { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--primary-ink); flex: none; }
 .ii .icon { width: 21px; height: 21px; }
 .ic-txt { flex: 1; min-width: 0; }
-.ic-txt a, .ic-txt b { font-weight: 700; overflow-wrap: anywhere; }
+.ic-txt a, .ic-txt b { font-weight: 700; overflow-wrap: break-word; }
 .email-card a:hover { color: var(--primary-ink); }
 .go { color: var(--muted); }
 .insta-card { position: relative; display: flex; align-items: center; gap: 1rem; padding: 1.3rem 1.2rem; border-radius: var(--radius); color: #fff; overflow: hidden; background: linear-gradient(135deg, #f58529, #dd2a7b 45%, #8134af 75%, #515bd4); box-shadow: var(--shadow); transform: rotate(-1deg); transition: transform .3s var(--ease); flex-wrap: wrap; }
@@ -811,4 +811,150 @@ body:not(.no-anim) .ns-plane { animation: land 1s var(--ease) both; }
   .insta-card > span:nth-child(2), .insta-card > div { flex: 1 1 150px; min-width: 0; }
   .ig-btn { margin-left: auto; }
   .toss-msg { bottom: auto; top: 2.6rem; font-size: 1.35rem; }
+}
+
+/* =====================================================================
+   PC + MOBILE COMPATIBILITY
+   ===================================================================== */
+/* never allow sideways scrolling (clip keeps position: sticky working) */
+html, body { overflow-x: clip; max-width: 100%; }
+img, video, canvas, iframe { max-width: 100%; }
+button, a, input, select, textarea, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+/* iPhone notch / home bar (landscape + bottom) */
+.container { width: min(100% - 2.5rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px), var(--container)); }
+.to-top { right: calc(1.4rem + env(safe-area-inset-right, 0px)); bottom: calc(1.4rem + env(safe-area-inset-bottom, 0px)); }
+.toast { bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px)); }
+.mobile-menu { padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); padding-left: calc(1.5rem + env(safe-area-inset-left, 0px)); padding-right: calc(1.5rem + env(safe-area-inset-right, 0px)); overscroll-behavior: contain; }
+.footer { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* bigger tap targets */
+.logo { padding: .45rem 0; }
+.search-box input { height: 100%; font-size: 16px; }
+
+/* grids can always shrink to the screen */
+.index-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.explore { grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.contact-grid > *, .about-grid > *, .hero-grid > *, .play-grid > *, .feature > *, .footer-top > * { min-width: 0; }
+.info-card, .ic-txt, .insta-card { min-width: 0; }
+
+/* mobile menu extra actions */
+.mm-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.4rem; }
+.mm-actions .btn { flex: 1 1 200px; justify-content: center; }
+
+/* touch screens: no sticky hover effects after a tap, no "drag me" hint */
+@media (hover: none) {
+  .drag-hint { display: none; }
+  .ex-card:hover, .index-card:hover, .assign:hover, .menu-card:hover, .polaroid:hover, .info-card:hover, a.info-card:hover,
+  .insta-card:hover, .next-page:hover, .stat-card:hover, .icon-btn:hover, .to-top:hover, .footer-cols a:hover, .socials a:hover { transform: rotate(var(--r, 0deg)) !important; }
+  .ex-card:active, .index-card:active, .assign:active, .polaroid:active, .next-page:active, .insta-card:active { transform: scale(.98) rotate(var(--r, 0deg)) !important; transition-duration: .1s; }
+  .btn:active, .icon-btn:active { transform: scale(.95); }
+}
+
+/* phones: gentler tilt so rotated cards never touch the screen edge */
+@media (max-width: 700px) {
+  .index-card, .assign, .menu-card { transform: rotate(calc(var(--r, 0deg) * .35)); }
+  .hero-sticky-l { left: 0; }
+  .mobile-menu a { font-size: 1.65rem; padding: .5rem 0; }
+  .mobile-menu a em { font-size: 1.15rem; }
+}
+
+/* tablets */
+@media (min-width: 701px) and (max-width: 1080px) {
+  .explore { grid-template-columns: repeat(3, 1fr); }
+  .hero-grid { gap: 2.5rem; }
+}
+
+/* landscape phones: short screens */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root { --nav-h: 56px; }
+  .hero { min-height: auto; padding: calc(var(--nav-h) + 1.5rem) 0 2.5rem; }
+  .hero-grid { grid-template-columns: 1.2fr 1fr; gap: 1.5rem; }
+  .hero-art { height: 340px; }
+  .scroll-hint { display: none; }
+  .mobile-menu a { font-size: 1.5rem; padding: .45rem 0; }
+  .mm-inner { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+  .mm-actions, .mm-socials { grid-column: 1 / -1; }
+  .doodle-wrap { height: 260px; }
+  .lightbox img, #lb-img { max-height: 70vh; }
+}
+
+/* small phones (≤ 400px) */
+@media (max-width: 400px) {
+  .container { width: min(100% - 1.75rem, var(--container)); }
+  .logo { font-size: 1.25rem; }
+  .nav-actions { gap: .3rem; }
+  .icon-btn, .kbd-btn { width: 38px; height: 38px; border-radius: 10px; }
+  .page-title, .page-head h1 { font-size: clamp(2rem, 10.5vw, 2.6rem); }
+  .hero-name { font-size: clamp(3.4rem, 19vw, 4.6rem); }
+  .ex-card { min-height: 0; }
+  .ex-card h3 { font-size: 1.45rem; }
+  .ex-card p { font-size: 1.15rem; }
+  .info-card { padding: .95rem 1rem; gap: .8rem; }
+  .info-card b, .info-card .ic-txt a { font-size: .92rem; }
+  .ii { width: 40px; height: 40px; }
+  .notebook { padding-left: 3rem; padding-right: 1rem; }
+  .report { padding: 1.2rem .8rem; }
+  .rp-school b { font-size: 1.25rem; }
+  .rp-table th:nth-child(1) { width: 46%; }
+  .mbar { width: 64px; }
+  .hero-stats { gap: 1rem; }
+  .pola-wall { gap: 1.1rem .8rem; }
+}
+
+/* tiny phones (≤ 360px): the specs (photos) button stays, the theme switch moves into the ☰ menu, stickies go single column */
+@media (max-width: 360px) {
+  #teacher-btn:not(.specs-photos) { display: none; }
+  #teacher-btn.specs-photos ~ #theme-toggle { display: none; }
+  .explore { grid-template-columns: 1fr; }
+  .tool { padding-inline: .55rem; }
+}
+
+/* big screens */
+@media (min-width: 1600px) {
+  :root { --container: 1320px; }
+  html { font-size: calc(var(--fs) * 1.06); }
+}
+
+/* ============================== PHOTOS (memory box) ============================== */
+#teacher-btn.active { border-color: var(--primary); color: var(--primary-ink, var(--primary)); }
+.mem-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem 1.2rem; margin: 0 0 2.4rem; padding-bottom: 1rem; border-bottom: 1.5px dashed var(--border); }
+.mem-count { font-size: 1.6rem; line-height: 1; color: var(--muted); }
+.mem-count b { font-family: var(--font-heading); font-weight: 400; font-size: 2.1rem; color: var(--primary); margin-right: .15rem; }
+.memories.journal { display: flex; flex-direction: column; gap: 4.2rem; max-width: 980px; margin-inline: auto; padding: .5rem 0 1rem; }
+.memory { position: relative; }
+.memories.journal .memory { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: 2.6rem; }
+.memories.journal .memory.flip .mem-photo { order: 2; }
+.memories.journal .memory.flip .mem-note { order: 1; }
+.mem-photo { display: block; width: 100%; max-width: 400px; justify-self: center; cursor: zoom-in; text-align: left; }
+.mem-photo img { aspect-ratio: 4 / 5; }
+body:not(.no-anim) .memory.reveal.visible .mem-photo, body:not(.no-anim) .memory.reveal.visible .mem-note { transform: rotate(var(--r, 0deg)); }
+.mem-photo:hover { transform: rotate(0) scale(1.03) !important; z-index: 2; box-shadow: 0 30px 50px -18px rgba(0, 0, 0, .75); }
+.mem-note { position: relative; background: var(--sc, var(--s1)); color: #1b1b1b; padding: 1.7rem 1.5rem 1.3rem; border-radius: 2px 2px 22px 2px; transform: rotate(var(--r, 0deg)); box-shadow: 0 16px 28px -14px rgba(0, 0, 0, .6), inset 0 -20px 34px -26px rgba(0, 0, 0, .3); transition: transform .3s var(--ease); background-image: repeating-linear-gradient(transparent 0 calc(1.6rem - 1px), rgba(0, 0, 0, .08) calc(1.6rem - 1px) 1.6rem); background-position: 0 2.55rem; }
+.mem-note:hover { transform: rotate(0) !important; }
+.mem-k { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .6; margin-bottom: .35rem; }
+.mem-note p { font-size: 1.55rem; line-height: 1.6rem; overflow-wrap: anywhere; }
+.mem-meta { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin-top: 1rem; padding-top: .7rem; border-top: 1.5px dashed rgba(0, 0, 0, .25); font-size: .82rem; font-weight: 600; }
+.mem-date { font-size: .78rem; }
+.mem-string { position: absolute; left: 50%; bottom: -3.9rem; width: 64px; transform: translateX(-50%) rotate(78deg); color: var(--muted); opacity: .55; pointer-events: none; }
+.memory.flip .mem-string { transform: translateX(-50%) rotate(102deg) scaleY(-1); }
+.mem-string .dd { width: 100%; height: auto; }
+.memories.wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 3rem 2rem; padding-top: 1rem; }
+.memories.wall .memory { display: flex; flex-direction: column; align-items: center; }
+.memories.wall .mem-note { margin-top: -1.2rem; width: 90%; z-index: 3; padding: 1.3rem 1.1rem 1rem; }
+.memories.wall .mem-note p { font-size: 1.35rem; line-height: 1.6rem; }
+.mem-empty { position: relative; max-width: 460px; margin: 2rem auto; background: var(--s1); color: #1b1b1b; padding: 2.2rem 1.6rem; text-align: center; transform: rotate(-2deg); box-shadow: var(--shadow); }
+.mem-empty p { font-size: 1.6rem; line-height: 1.15; }
+@media (max-width: 760px) {
+  .memories.journal { gap: 3.4rem; }
+  .memories.journal .memory { grid-template-columns: 1fr; gap: 0; }
+  .memories.journal .memory.flip .mem-photo, .memories.journal .memory.flip .mem-note { order: 0; }
+  .mem-photo { max-width: 340px; }
+  .memories.journal .mem-note { width: min(92%, 380px); justify-self: center; margin-top: -1.4rem; z-index: 3; }
+  .mem-note p { font-size: 1.4rem; }
+  .mem-string { display: none; }
+}
+@media (max-width: 400px) {
+  .mem-note { padding: 1.4rem 1.1rem 1.1rem; }
+  .mem-count { font-size: 1.4rem; }
 }
