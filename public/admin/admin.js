@@ -322,6 +322,7 @@
     { name: 'Blue Ink', primary: '#5b8cff', secondary: '#ff7a59', accent: '#ffd166', background: '#0d1220', surface: '#151c2f', text: '#eaf0ff', muted: '#93a0bf', sticky1: '#ffe873', sticky2: '#ffc2b3', sticky3: '#b3cdff', sticky4: '#c4f0b0' },
     { name: 'Pencil Mono', primary: '#e8e8e8', secondary: '#bdbdbd', accent: '#ffffff', background: '#111111', surface: '#1b1b1b', text: '#f2f2f2', muted: '#9a9a9a', sticky1: '#efefef', sticky2: '#dcdcdc', sticky3: '#cfcfcf', sticky4: '#e6e6e6' }
   ];
+  var NOTE_COLORS = [{ value: 'auto', label: 'Auto (rotates through your 4 sticky colours)' }, { value: '1', label: 'Sticky colour 1 (yellow)' }, { value: '2', label: 'Sticky colour 2 (pink)' }, { value: '3', label: 'Sticky colour 3 (blue)' }, { value: '4', label: 'Sticky colour 4 (green)' }];
   var iconOptions = function () { return I.uiNames.map(function (n) { return { value: n, label: n }; }); };
   var brandOptions = function () { return [{ value: '', label: '(no logo)' }].concat(I.brandNames.map(function (n) { return { value: n, label: n }; })); };
   var platformOptions = function () { return ['email', 'website', 'phone'].concat(I.brandNames).map(function (n) { return { value: n, label: n }; }); };
@@ -609,6 +610,27 @@
       ] },
       labelPanel('gallery')
     ] },
+    { id: 'photos', page: 'photos', label: 'Photos (Memory Box)', icon: 'camera', intro: 'Your private-feeling memory box at /photos — the 👓 specs button in the top bar opens it in a new tab. Every photo gets a handwritten memory note beside it. Anything you pin or save here goes live for every visitor.', panels: [
+      { title: '📌 Pin a new memory', render: renderPhotoQuickAdd },
+      { title: 'Your memories', hint: 'Edit any note, swap a photo, change the date/place, hide one for a while, reorder with the arrows, duplicate or delete. Remember to hit Save.', path: 'photos', render: renderPhotoTools, fields: [
+        { key: 'items', type: 'list', itemLabel: 'Memory', titleKey: 'memory', subKey: 'date', thumbKey: 'image', newItem: { image: '', memory: '', date: '', place: '', color: 'auto', hidden: false }, fields: [
+          { key: 'image', label: 'Photo', type: 'image' },
+          { key: 'memory', label: 'Memory note (shown beside the photo)', type: 'textarea', rows: 4, help: 'Write it like a diary — new lines are kept.' },
+          { key: 'date', label: 'Date', inputType: 'date', help: 'Optional. Used for the year filter.' },
+          { key: 'place', label: 'Place', placeholder: 'Delhi, school, the ground…' },
+          { key: 'color', label: 'Note colour', type: 'select', options: NOTE_COLORS },
+          { key: 'hidden', label: 'Hide this memory from visitors', type: 'toggle' }] }
+      ] },
+      { title: 'Page header & layout', path: 'photos', fields: pageHead([
+        { key: 'layout', label: 'Layout', type: 'select', options: [{ value: 'journal', label: '📔 Journal — big photo with the note beside it (zig-zag)' }, { value: 'wall', label: '🧱 Wall — polaroid grid with the note pinned under each photo' }] },
+        { key: 'emptyText', label: 'Text when there are no photos yet', full: true },
+        { key: 'showDates', label: 'Show dates & places', type: 'toggle' },
+        { key: 'showCount', label: 'Show “N memories” counter', type: 'toggle' },
+        { key: 'yearFilter', label: 'Show year filter (when photos span 2+ years)', type: 'toggle' }]) },
+      { title: '👓 Specs button in the top bar', path: 'site', fields: [
+        { key: 'specsAction', label: 'When visitors click the specs (glasses) icon…', type: 'select', full: true, options: [{ value: 'photos', label: 'Open my Photos page in a new tab' }, { value: 'teacher', label: 'Toggle Teacher Mode (old behaviour)' }, { value: 'none', label: 'Hide the specs button' }], help: 'Teacher Mode still works with its hotkey, the Ctrl+K menu and the phone menu.' }] },
+      labelPanel('photos')
+    ] },
     { id: 'playground', page: 'playground', label: 'Playground (Arcade)', icon: 'gamepad-2', panels: [
       { title: 'Page header', path: 'playground', fields: pageHead() },
       { title: 'Doodle on my desk', path: 'playground', fields: [
@@ -679,7 +701,7 @@
           { key: 'url', label: 'URL', type: 'url', full: true, help: 'For email use <code class="k">mailto:you@mail.com</code>' }] }
       ] }
     ] },
-    { id: 'teacher', label: 'Teacher Mode', icon: 'eye-off', intro: 'The boss key: visitors press a key (default T) and the whole site instantly turns into boring class notes.', panels: [
+    { id: 'teacher', label: 'Teacher Mode', icon: 'eye-off', intro: 'The boss key: visitors press a key (default T) — or use the Ctrl+K menu / phone menu — and the whole site instantly turns into boring class notes. (The 👓 specs button now opens your Photos page; change that in Photos → Specs button.)', panels: [
       { title: 'Fake class notes', path: 'teacher', fields: [
         { key: 'enabled', label: 'Enable teacher mode', type: 'toggle' },
         { key: 'hotkey', label: 'Hotkey (single letter)' },
@@ -768,6 +790,7 @@
       ['shopping-bag', (c.products.items || []).length, 'Products', 'products'],
       ['code', (c.skills.items || []).length, 'Skills', 'skills'],
       ['image', (c.gallery.items || []).length, 'Gallery photos', 'gallery'],
+      ['camera', ((c.photos || {}).items || []).length, 'Memories (/photos)', 'photos'],
       ['inbox', messages.length, unread ? unread + ' unread' : 'Messages', 'messages'],
       ['share-2', (c.socials || []).length, 'Social links', 'socials']
     ];
@@ -778,6 +801,7 @@
       h('button', { class: 'a-btn', html: I.ui('palette') + 'Change colors', onclick: function () { go('theme'); } }),
       h('button', { class: 'a-btn', html: I.ui('layout-grid') + 'Pages & menu', onclick: function () { go('pages'); } }),
       h('button', { class: 'a-btn', html: I.ui('plus') + 'Add a project', onclick: function () { go('projects'); } }),
+      h('button', { class: 'a-btn', html: I.ui('camera') + 'Pin a memory', onclick: function () { go('photos'); } }),
       h('button', { class: 'a-btn', html: I.ui('upload') + 'Upload photos', onclick: function () { go('media'); } }),
       h('button', { class: 'a-btn', html: I.ui('type') + 'Edit small texts', onclick: function () { go('labels'); } }),
       h('button', { class: 'a-btn', html: I.ui('eye') + 'Live preview', onclick: togglePreview })
@@ -804,8 +828,63 @@
     panel.appendChild(dz);
   }
 
+  /* ---- Photos: quick add form ("pin & publish") ---- */
+  function photosObj() {
+    if (!state.photos) state.photos = { items: [] };
+    if (!Array.isArray(state.photos.items)) state.photos.items = [];
+    return state.photos;
+  }
+  function renderPhotoQuickAdd(panel) {
+    var draft = { pos: 'top', image: '', memory: '', date: (function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })(new Date()), place: '', color: 'auto', hidden: false };
+    panel.appendChild(h('p', { class: 'hint', text: 'Upload a photo, write the memory that goes with it, then pin it. It is saved and published instantly — everyone sees it on /photos.' }));
+    panel.appendChild(renderFields([
+      { key: 'image', label: 'Photo', type: 'image' },
+      { key: 'memory', label: 'Memory note', type: 'textarea', rows: 4, placeholder: 'What happened here? Who was there? Why does it matter to you?' },
+      { key: 'date', label: 'Date', inputType: 'date' },
+      { key: 'place', label: 'Place', placeholder: 'Where was this?' },
+      { key: 'color', label: 'Note colour', type: 'select', options: NOTE_COLORS },
+      { key: 'pos', label: 'Add it to the…', type: 'select', options: [{ value: 'top', label: 'Top of the page (newest first)' }, { value: 'bottom', label: 'Bottom of the page' }] }
+    ], draft));
+    var pin = h('button', { type: 'button', class: 'a-btn primary', html: I.ui('pin') + 'Pin & publish' });
+    pin.onclick = function () {
+      if (!draft.image) { toast('Upload or choose a photo first', 'err'); return; }
+      var it = clone(draft), arr = photosObj().items;
+      delete it.pos;
+      if (draft.pos === 'bottom') arr.push(it); else arr.unshift(it);
+      var pg = state.pages.find(function (p) { return p.id === 'photos'; });
+      if (pg && !pg.enabled) pg.enabled = true;
+      changed();
+      if (!isDirty()) { go('photos'); return; }
+      pin.disabled = true;
+      api('/api/admin/content', { method: 'PUT', json: state })
+        .then(function () { savedJSON = JSON.stringify(state); changed(); toast('Memory pinned & live on /photos 📸'); go('photos'); })
+        .catch(function (e) { toast(e.message + ' — click Save to retry', 'err'); pin.disabled = false; go('photos'); });
+    };
+    var view = h('a', { class: 'a-btn', href: '/photos', target: '_blank', rel: 'noopener', html: I.ui('external-link') + 'Open /photos' });
+    panel.appendChild(h('div', { class: 'quick', style: 'margin-top:1rem' }, [pin, view]));
+  }
+  /* ---- Photos: bulk add + sort tools above the list ---- */
+  function renderPhotoTools(panel) {
+    var dz = dropzone(function (files) {
+      var arr = photosObj().items, n = 0;
+      files.forEach(function (f) { if (!/\.pdf$/i.test(f.name)) { arr.push({ image: f.url, memory: '', date: '', place: '', color: 'auto', hidden: false }); n++; } });
+      changed(); go('photos'); toast(n + ' photo(s) added at the bottom — write their memories, then Save');
+    }, 'image/*');
+    dz.querySelector('div').innerHTML = '<b>Bulk add photos</b> — click or drop several images, then write a memory for each below';
+    panel.appendChild(dz);
+    function sortBy(dir) {
+      photosObj().items.sort(function (a, b) { var x = a.date || '', y = b.date || ''; if (!x) return 1; if (!y) return -1; return dir * (x < y ? -1 : x > y ? 1 : 0); });
+      changed(); go('photos'); toast('Sorted — remember to save');
+    }
+    panel.appendChild(h('div', { class: 'quick', style: 'margin:.9rem 0 .4rem' }, [
+      h('button', { type: 'button', class: 'a-btn sm', html: I.ui('arrow-down') + 'Sort newest first', onclick: function () { sortBy(-1); } }),
+      h('button', { type: 'button', class: 'a-btn sm', html: I.ui('arrow-up') + 'Sort oldest first', onclick: function () { sortBy(1); } }),
+      h('button', { type: 'button', class: 'a-btn sm', html: I.ui('eye') + 'Show all hidden', onclick: function () { photosObj().items.forEach(function (x) { x.hidden = false; }); changed(); go('photos'); } })
+    ]));
+  }
+
   function renderAllLabels(el) {
-    var names = { general: 'Global', home: 'Home page', about: 'About page', skills: 'Skills / report card', projects: 'Projects page', products: 'Store page', gallery: 'Gallery page', playground: 'Playground page', contact: 'Contact page & form', footer: 'Footer', cmdk: 'Command menu (Ctrl+K)', terminal: 'Terminal' };
+    var names = { general: 'Global', home: 'Home page', about: 'About page', skills: 'Skills / report card', projects: 'Projects page', products: 'Store page', gallery: 'Gallery page', photos: 'Photos / memory box', playground: 'Playground page', contact: 'Contact page & form', footer: 'Footer', cmdk: 'Command menu (Ctrl+K)', terminal: 'Terminal' };
     Object.keys(state.labels || {}).forEach(function (g) {
       var panel = h('div', { class: 'panel' }, [h('h3', { text: names[g] || humanize(g) })]);
       panel.appendChild(labelFields(g));

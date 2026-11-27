@@ -458,8 +458,57 @@
         var it = galleryItems()[Number(b.dataset.i)];
         if (!it) return;
         if (it.link) { window.open(it.link, '_blank', 'noopener'); return; }
-        openLightbox(Number(b.dataset.i));
+        openLightbox(Number(b.dataset.i), galleryItems());
       });
+    });
+  };
+
+  /* ---------- PHOTOS (memory box) ---------- */
+  function photoItems() { return ((C.photos && C.photos.items) || []).filter(function (x) { return x && x.image && !x.hidden; }); }
+  function fmtDate(d) {
+    if (!d) return '';
+    var m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(String(d).trim());
+    if (!m) return String(d);
+    try { return new Date(+m[1], +m[2] - 1, +(m[3] || 1)).toLocaleDateString(undefined, m[3] ? { day: 'numeric', month: 'short', year: 'numeric' } : { month: 'short', year: 'numeric' }); } catch (e) { return String(d); }
+  }
+  function yearOf(d) { var m = /(\d{4})/.exec(String(d || '')); return m ? m[1] : ''; }
+  function noteColor(it, i) { var c = String(it.color || 'auto'); return /^[1-4]$/.test(c) ? c : String(i % 4 + 1); }
+  P.photos = function () {
+    var ph = C.photos || {}, items = photoItems(), journal = ph.layout !== 'wall';
+    var years = []; items.forEach(function (it) { var y = yearOf(it.date); if (y && years.indexOf(y) < 0) years.push(y); });
+    years.sort().reverse();
+    var bar = (ph.showCount !== false || (ph.yearFilter !== false && years.length > 1)) && items.length ?
+      '<div class="mem-bar reveal">' +
+        (ph.showCount !== false ? '<span class="mem-count hand"><b id="mem-n">' + items.length + '</b> ' + esc(L('photos', 'memoriesWord')) + '</span>' : '<span></span>') +
+        (ph.yearFilter !== false && years.length > 1 ? '<div class="filters" id="mem-years"><button class="filter active" type="button" data-y="">' + esc(L('photos', 'all')) + '</button>' + years.map(function (y) { return '<button class="filter" type="button" data-y="' + y + '">' + y + '</button>'; }).join('') + '</div>' : '') +
+      '</div>' : '';
+    var list = items.map(function (it, i) {
+      var date = ph.showDates !== false && it.date ? '<span class="mem-date mono">' + esc(L('photos', 'dateWord')) + ' ' + esc(fmtDate(it.date)) + '</span>' : '';
+      var place = it.place ? '<span class="mem-place">' + esc(L('photos', 'place')) + ' ' + esc(it.place) + '</span>' : '';
+      var photo = '<button class="polaroid mem-photo" type="button" data-i="' + i + '" style="--r:' + rot(i + 1, 1.1) + 'deg" aria-label="' + esc(L('photos', 'openPhoto')) + '">' +
+        '<span class="tape"></span>' + img(it.image, it.memory ? it.memory.slice(0, 80) : '') + '</button>';
+      var note = it.memory || date || place ? '<div class="mem-note c' + noteColor(it, i) + '" style="--r:' + rot(i + 4, .9) + 'deg"><span class="pin"></span>' +
+        (journal ? '<span class="mem-k mono">' + esc(L('photos', 'memoryTitle')) + '</span>' : '') +
+        (it.memory ? '<p class="hand">' + esc(it.memory).replace(/\n/g, '<br>') + '</p>' : '') +
+        (date || place ? '<div class="mem-meta">' + date + place + '</div>' : '') + '</div>' : '';
+      return '<article class="memory reveal' + (i % 2 ? ' flip' : '') + '" data-y="' + yearOf(it.date) + '">' + photo + note + (journal && i < items.length - 1 ? '<span class="mem-string" aria-hidden="true">' + D.arrow + '</span>' : '') + '</article>';
+    }).join('');
+    return '<section class="page"><div class="container">' + pageHead('photos', ph) + bar +
+      (items.length ? '<div class="memories ' + (journal ? 'journal' : 'wall') + '" id="memories">' + list + '</div>'
+        : '<div class="mem-empty reveal"><span class="pin"></span><p class="hand">' + esc(ph.emptyText || '') + '</p></div>') +
+    '</div></section>';
+  };
+  M.photos = function () {
+    var items = photoItems();
+    var lb = items.map(function (it) { var meta = [fmtDate(it.date), it.place].filter(Boolean).join(' · '); return { image: it.image, caption: (it.memory || '') + (meta ? (it.memory ? '  —  ' : '') + meta : '') }; });
+    $$('.mem-photo').forEach(function (b) { b.addEventListener('click', function () { openLightbox(Number(b.dataset.i), lb); }); });
+    var years = $('#mem-years');
+    if (years) years.addEventListener('click', function (e) {
+      var c = e.target.closest('.filter'); if (!c) return;
+      $$('#mem-years .filter').forEach(function (x) { x.classList.toggle('active', x === c); });
+      var y = c.dataset.y, n = 0;
+      $$('.memory').forEach(function (m) { var show = !y || m.dataset.y === y; m.hidden = !show; if (show) n++; });
+      var ne = $('#mem-n'); if (ne) ne.textContent = n;
     });
   };
 
@@ -591,9 +640,13 @@
       '<div class="mm-socials socials">' + socialLinks(C.socials) + '</div></div>';
     $('#cmdk-btn').hidden = !s.commandPalette;
     $('#cmdk-btn').innerHTML = I.ui('search') + '<span class="kb-label">' + esc(L('general', 'searchButton')) + '</span><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl') + ' K</kbd>';
-    var tb = $('#teacher-btn');
-    tb.hidden = !(C.teacher && C.teacher.enabled);
-    tb.innerHTML = I.ui('glasses'); tb.title = L('general', 'teacherButton'); tb.setAttribute('aria-label', L('general', 'teacherButton'));
+    var tb = $('#teacher-btn'), sa = specsAction(), tl = sa === 'photos' ? L('general', 'specsButton') : L('general', 'teacherButton');
+    tb.hidden = !sa;
+    tb.innerHTML = I.ui('glasses'); tb.title = tl; tb.setAttribute('aria-label', tl);
+    // photos mode = a real link that opens the memory box in a NEW tab; teacher mode = a toggle
+    tb.href = sa === 'photos' ? pathFor('photos') : '#';
+    if (sa === 'photos') { tb.target = '_blank'; tb.rel = 'noopener'; } else { tb.removeAttribute('target'); tb.setAttribute('role', 'button'); }
+    if (sa === 'photos') tb.removeAttribute('role');
     $('#theme-toggle').title = L('general', 'themeButton'); $('#theme-toggle').setAttribute('aria-label', L('general', 'themeButton'));
     $('#to-top').innerHTML = '<svg class="ring" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" stroke-dasharray="150.8" stroke-dashoffset="150.8" id="top-ring"/></svg>' + I.ui('arrow-up');
     $('#to-top').setAttribute('aria-label', L('general', 'backToTop'));
@@ -642,6 +695,7 @@
     document.body.dataset.page = currentId;
     if (!teacherOn) document.title = titleFor(pg);
     $$('#nav-links a, #mobile-menu a').forEach(function (a) { a.classList.toggle('active', a.dataset.id === currentId); });
+    $('#teacher-btn').classList.toggle('active', currentId === 'photos' && specsAction() === 'photos');
     if (pg && M[pg.id]) M[pg.id]();
     observe();
     if (!keepScroll) window.scrollTo(0, 0);
@@ -1038,10 +1092,20 @@
     startClock._iv = setInterval(tick, 1000);
   }
 
+  /** What the 👓 specs button in the top bar does: 'photos' (open the memory box), 'teacher' or '' (hidden). */
+  function specsAction() {
+    var a = (C.site || {}).specsAction || 'photos';
+    if (a === 'photos') { var pg = pageById('photos'); return pg && pg.enabled && C.photos ? 'photos' : (C.teacher && C.teacher.enabled ? 'teacher' : ''); }
+    if (a === 'teacher') return C.teacher && C.teacher.enabled ? 'teacher' : '';
+    return '';
+  }
+
   /* ---------- lightbox & modal ---------- */
-  var lbIndex = 0;
-  function openLightbox(i) {
-    var items = galleryItems();
+  var lbIndex = 0, lbItems = null;
+  /** items: optional [{image, caption}] list (defaults to the gallery). */
+  function openLightbox(i, items) {
+    if (items) lbItems = items;
+    items = lbItems || galleryItems();
     if (!items.length) return;
     lbIndex = (i + items.length) % items.length;
     var it = items[lbIndex], im = $('#lb-img');
@@ -1219,7 +1283,10 @@
       if (b.dataset.mm === 'teacher') setTimeout(toggleTeacher, 120); else toggleTheme();
     });
     $('#theme-toggle').addEventListener('click', toggleTheme);
-    $('#teacher-btn').addEventListener('click', toggleTeacher);
+    $('#teacher-btn').addEventListener('click', function (e) {
+      if (specsAction() === 'photos') { e.stopPropagation(); return; } // let the browser open the new tab
+      e.preventDefault(); e.stopPropagation(); toggleTeacher();
+    });
     $('#teacher').addEventListener('click', function () { if (teacherOn) toggleTeacher(); });
 
     // lightbox

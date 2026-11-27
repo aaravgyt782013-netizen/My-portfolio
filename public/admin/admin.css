@@ -65,7 +65,7 @@ h1, h2, h3, h4 { margin: 0; }
 @keyframes shake { 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-3px); } }
 
 /* ---------- inputs ---------- */
-input[type=text], input[type=email], input[type=password], input[type=url], input[type=number], input:not([type]), textarea, select {
+input[type=text], input[type=email], input[type=password], input[type=url], input[type=number], input[type=date], input:not([type]), textarea, select {
   width: 100%; padding: .65rem .8rem; border-radius: 10px; border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text); font: inherit; transition: border-color .15s, box-shadow .15s;
 }
 textarea { resize: vertical; min-height: 90px; }
@@ -313,3 +313,4 @@ input, textarea, select, button { touch-action: manipulation; }
   .l-actions .a-icon-btn[title="Duplicate"] { display: none; }
   .pv-devices { display: none; }
 }
+input[type=date] { color-scheme: dark; min-height: 2.6rem; }

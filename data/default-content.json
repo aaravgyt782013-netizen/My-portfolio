@@ -24,7 +24,8 @@
     ],
     "commandPalette": true,
     "customCss": "",
-    "customHead": ""
+    "customHead": "",
+    "specsAction": "photos"
   },
   "theme": {
     "mode": "dark",
@@ -145,6 +146,16 @@
       "inNav": false,
       "emoji": "📸",
       "blurb": "Polaroids from off the clock.",
+      "seoTitle": ""
+    },
+    {
+      "id": "photos",
+      "label": "Photos",
+      "slug": "photos",
+      "enabled": true,
+      "inNav": false,
+      "emoji": "📸",
+      "blurb": "My memory box — every photo comes with a note.",
       "seoTitle": ""
     },
     {
@@ -789,6 +800,50 @@
       }
     ]
   },
+  "photos": {
+    "heading": "My *memory box*",
+    "subheading": "Snapshots I never want to forget — each one comes with a little note from me.",
+    "note": "handle with care ✦",
+    "layout": "journal",
+    "showDates": true,
+    "showCount": true,
+    "yearFilter": true,
+    "emptyText": "No memories pinned yet — still picking the best ones 📸",
+    "items": [
+      {
+        "image": "/assets/profile.webp",
+        "memory": "Night walk after a long day of coding. City lights, cold air, zero bugs in my head for once. Silent moves, loud dreams.",
+        "date": "2025-12-14",
+        "place": "Delhi",
+        "color": "1",
+        "hidden": false
+      },
+      {
+        "image": "/assets/gallery-lastbench.webp",
+        "memory": "The famous last bench. Half my apps were sketched in the back of this notebook while the teacher explained trigonometry 😅",
+        "date": "2025-09-02",
+        "place": "School, last row",
+        "color": "2",
+        "hidden": false
+      },
+      {
+        "image": "/assets/gallery-football.webp",
+        "memory": "Sunday football with the boys. Scored one with my weak foot and celebrated like CR7. SIUUU! ⚽",
+        "date": "2025-07-20",
+        "place": "Local ground",
+        "color": "3",
+        "hidden": false
+      },
+      {
+        "image": "/assets/gallery-setup.webp",
+        "memory": "My little command center. Where ideas turn into code at 2 AM and the chai always goes cold.",
+        "date": "2025-03-11",
+        "place": "My room",
+        "color": "4",
+        "hidden": false
+      }
+    ]
+  },
   "playground": {
     "heading": "Last bench *arcade*",
     "subheading": "Things we did when the teacher wasn't looking.",
@@ -908,7 +963,8 @@
       "skipBoot": "skip →",
       "teacherButton": "Teacher's coming! (T)",
       "searchButton": "Search",
-      "themeButton": "Switch chalkboard / notebook"
+      "themeButton": "Switch chalkboard / notebook",
+      "specsButton": "My photos"
     },
     "home": {
       "featuredStamp": "TEACHER'S FAV",
@@ -1003,6 +1059,14 @@
     "terminal": {
       "hint": "type help and press enter ↵",
       "notFound": "command not found: {cmd}. type \"help\""
+    },
+    "photos": {
+      "memoriesWord": "memories",
+      "all": "All",
+      "openPhoto": "Open photo",
+      "memoryTitle": "a note from me",
+      "place": "📍",
+      "dateWord": "📅"
     }
   },
   "socials": [

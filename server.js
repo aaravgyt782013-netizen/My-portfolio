@@ -77,7 +77,14 @@ function getContent() {
   // make sure every known page exists in the page list (new pages appear switched off)
   if (!Array.isArray(merged.pages)) merged.pages = def.pages;
   else if (Array.isArray(def.pages)) {
-    for (const p of def.pages) if (!merged.pages.find((x) => x.id === p.id)) merged.pages.push({ ...p, enabled: false });
+    const ON_BY_DEFAULT = ['photos']; // pages the owner asked for — switched on right away after an upgrade
+    for (const p of def.pages) {
+      if (merged.pages.find((x) => x.id === p.id)) continue;
+      const at = def.pages.findIndex((d) => d.id === p.id), prev = def.pages[at - 1];
+      const i = prev ? merged.pages.findIndex((x) => x.id === prev.id) : -1;
+      const page = { ...p, enabled: ON_BY_DEFAULT.includes(p.id) ? p.enabled : false };
+      if (i >= 0) merged.pages.splice(i + 1, 0, page); else merged.pages.push(page);
+    }
     merged.pages = merged.pages.map((p) => ({ ...(def.pages.find((d) => d.id === p.id) || {}), ...p }));
   }
   return merged;

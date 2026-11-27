@@ -20,13 +20,14 @@ A **backbencher-themed** multi-page developer portfolio (chalkboard dark mode, n
 | Store | `/store` | "The canteen": products with price tags and ribbons |
 | Journey | `/journey` | "My timetable": a timeline that fills as you scroll |
 | Gallery | `/gallery` | Polaroid wall with lightbox and an Instagram follow button |
+| Photos | `/photos` | **My memory box.** Every photo has a handwritten **memory note** pinned beside it, with date, place and a year filter. The 👓 specs button in the top bar opens it in a new tab |
 | Playground | `/playground` | **Doodle on my desk** (save as PNG), **paper-toss game** with wind and best score, **homework excuse generator** |
 | Contact | `/contact` | Email (copy button), **Instagram card**, socials and a paper-plane **note form** |
 | Reviews | `/reviews` | Off by default. Turn it on in the admin |
 | 404 | anything else | A detention slip |
 
 Fun extras:
-- **Teacher mode:** press `T` and the site instantly turns into boring physics notes (the boss key)
+- **Teacher mode:** press `T` (or use `Ctrl/⌘ + K` or the ☰ menu) and the site instantly turns into boring physics notes (the boss key)
 - `Ctrl/⌘ + K` command menu, a chalk-dust trail, a pencil cursor, page-flip transitions and an "attendance" boot screen
 - Terminal commands: `help`, `whoami`, `cd projects`, `open instagram`, `excuse`, `teacher`, plus your own commands
 
@@ -50,7 +51,8 @@ Fun extras:
 - **All Small Texts:** every button label, hint, placeholder and menu word on the site
 - **Colors & Theme:** chalkboard and notebook colors, paper and four sticky-note colors, 7 presets, Google Fonts (heading, body, handwriting, mono), text size, roundness, width, background pattern, and every effect on/off
 - **Custom code:** extra CSS and `<head>` HTML (analytics, verification tags)
-- **Photos:** upload (drag and drop), media library, bulk-add gallery photos
+- **Photos (Memory Box):** "Pin & publish" a photo with its memory note, date, place and note colour in one step. It's saved to the server and goes live for every visitor straight away. You can edit, hide, reorder, duplicate, delete, bulk-add and sort by date, switch between journal and wall layouts, and choose what the 👓 specs button does (open Photos, teacher mode or hidden)
+- **Media:** upload (drag and drop), media library, bulk-add gallery photos
 - **Live preview** that follows the page you're editing (desktop and mobile views)
 - Inbox for contact-form messages, backup export/import, reset to defaults, `Ctrl/Cmd + S` to save
 
@@ -101,3 +103,5 @@ If a `content.json` saved by the old version exists, it is backed up automatical
 ## Deploying
 
 This app needs a Node.js host with a persistent disk, for example **Render**, **Railway**, **Fly.io** or a VPS. Set the environment variables in the host's dashboard. Point `DATA_DIR` and `UPLOAD_DIR` at the persistent disk so your edits and uploads survive redeploys.
+
+> **Important for /photos and every admin save:** everything you save in the admin is stored on the server (`content.json` plus the `uploads/` folder), so every visitor sees it. On Render, add a **Disk** mounted at `/var/data` and set `DATA_DIR=/var/data/data` and `UPLOAD_DIR=/var/data/uploads`. Without a disk, Render wipes your saved changes and uploaded photos whenever the service restarts or redeploys.
