@@ -6,7 +6,7 @@
   <title>{{TITLE}}</title>
   <meta name="description" content="{{DESCRIPTION}}" />
   <meta name="keywords" content="{{KEYWORDS}}" />
-  <meta name="theme-color" content="#050507" />
+  <meta name="theme-color" content="#121513" />
   <meta property="og:title" content="{{TITLE}}" />
   <meta property="og:description" content="{{DESCRIPTION}}" />
   <meta property="og:image" content="{{OG_IMAGE}}" />
@@ -15,21 +15,45 @@
   <link rel="icon" href="{{FAVICON}}" id="favicon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" id="font-link" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
-  <link rel="stylesheet" href="/css/style.css" />
+  {{PRELOAD}}
+  <link rel="stylesheet" href="/css/style.css?v={{V}}" />
   <script>/*{{CONTENT}}*/</script>
   <script>
+    /* Runs before first paint: applies colors, fonts & visitor preferences so nothing flashes. */
     (function () {
-      var c = window.__CONTENT__ || {}; var t = c.theme || {};
-      try { var m = localStorage.getItem('pf-theme'); if (m && t.allowVisitorToggle) document.documentElement.dataset.theme = m; } catch (e) {}
+      var c = window.__CONTENT__ || {}, t = c.theme || {}, d = document.documentElement;
+      function hx(v, fb) { return /^#([0-9a-f]{3,8})$/i.test(v || '') ? v : fb; }
+      function fn(f, fb) { return String(f || fb).replace(/[^\w\s-]/g, ''); }
+      function lum(h) { h = h.replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); var n = parseInt(h.slice(0, 6), 16); return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255; }
+      window.__pfThemeCSS = function (t) {
+        var p = hx(t.primary, '#ffd60a'), s = hx(t.secondary, '#ff5a5f');
+        return ':root{--primary:' + p + ';--on-primary:' + (lum(p) > .6 ? '#141414' : '#ffffff') + ';--secondary:' + s + ';--on-secondary:' + (lum(s) > .6 ? '#141414' : '#ffffff') + ';--accent:' + hx(t.accent, '#5ec8ff') + ';' +
+          '--paper:' + hx(t.paper, '#fbf8ef') + ';--paper-text:' + hx(t.paperText, '#1f2430') + ';' +
+          '--s1:' + hx(t.sticky1, '#ffe873') + ';--s2:' + hx(t.sticky2, '#ffb3c7') + ';--s3:' + hx(t.sticky3, '#a8dcff') + ';--s4:' + hx(t.sticky4, '#b8f0a0') + ';' +
+          '--radius:' + (Number(t.radius) >= 0 ? Number(t.radius) : 14) + 'px;--container:' + (Number(t.containerWidth) || 1180) + 'px;--fs:' + (Number(t.baseFontSize) || 16) + 'px;' +
+          "--font-heading:'" + fn(t.fontHeading, 'Permanent Marker') + "',system-ui,sans-serif;--font-body:'" + fn(t.fontBody, 'Space Grotesk') + "',system-ui,sans-serif;" +
+          "--font-hand:'" + fn(t.fontHand, 'Caveat') + "',cursive;--font-mono:'" + fn(t.fontMono, 'JetBrains Mono') + "',ui-monospace,monospace;}" +
+          '[data-theme="dark"]{--bg:' + hx(t.background, '#121513') + ';--surface:' + hx(t.surface, '#1b1f1c') + ';--text:' + hx(t.text, '#f2efe6') + ';--muted:' + hx(t.muted, '#9ca39d') + ';}' +
+          '[data-theme="light"]{--bg:' + hx(t.lightBackground, '#f6f1e4') + ';--surface:' + hx(t.lightSurface, '#fffdf6') + ';--text:' + hx(t.lightText, '#1c1c1e') + ';--muted:' + hx(t.lightMuted, '#5f5b52') + ';}';
+      };
+      window.__pfFontsHref = function (t) {
+        var fams = [t.fontHeading || 'Permanent Marker', t.fontBody || 'Space Grotesk', t.fontHand || 'Caveat', t.fontMono || 'JetBrains Mono']
+          .filter(function (v, i, a) { return v && a.indexOf(v) === i; });
+        var w = { 'Permanent Marker': '', 'Caveat': ':wght@500;700', 'Space Grotesk': ':wght@400;500;700', 'JetBrains Mono': ':wght@400;600' };
+        return 'https://fonts.googleapis.com/css2?' + fams.map(function (f) { return 'family=' + encodeURIComponent(f).replace(/%20/g, '+') + (f in w ? w[f] : ':wght@400;700'); }).join('&') + '&display=swap';
+      };
+      var st = document.createElement('style'); st.id = 'theme-vars'; st.textContent = window.__pfThemeCSS(t); document.head.appendChild(st);
+      // fonts load without blocking the first paint
+      var fl = document.createElement('link'); fl.id = 'font-link'; fl.rel = 'stylesheet'; fl.media = 'print'; fl.href = window.__pfFontsHref(t);
+      fl.onload = function () { fl.media = 'all'; }; document.head.appendChild(fl);
+      try { var m = localStorage.getItem('pf-theme'); if (m && t.allowVisitorToggle) d.dataset.theme = m; } catch (e) {}
       var booted = false; try { booted = sessionStorage.getItem('pf-booted'); } catch (e) {}
-      var inFrame = window.self !== window.top;
-      if (c.site && c.site.preloader && !booted && !inFrame) document.documentElement.classList.add('is-booting');
+      if (c.site && c.site.preloader && !booted && window.self === window.top) d.classList.add('is-booting');
     })();
   </script>
+  {{CUSTOM_HEAD}}
 </head>
 <body>
-  <!-- boot screen -->
   <div class="boot" id="boot" aria-hidden="true">
     <div class="boot-inner">
       <div class="boot-lines" id="boot-lines"></div>
@@ -39,54 +63,35 @@
   </div>
 
   <div class="scroll-progress" id="scroll-progress"></div>
-  <div class="bg-fx" aria-hidden="true">
-    <div class="bg-grid"></div>
-    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
-  </div>
+  <div class="bg-fx" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
-  <div class="cursor-glow" aria-hidden="true"></div>
-  <div class="cursor-dot" aria-hidden="true"></div>
-  <div class="cursor-ring" aria-hidden="true"></div>
+  <canvas class="chalk-trail" id="chalk-trail" aria-hidden="true"></canvas>
 
   <header class="nav" id="nav">
     <div class="container nav-inner">
-      <a href="#hero" class="logo" id="logo" aria-label="Home"></a>
+      <a href="/" class="logo" id="logo" data-link aria-label="Home"></a>
       <nav class="nav-links" id="nav-links" aria-label="Main"></nav>
       <div class="nav-actions">
         <button class="kbd-btn" id="cmdk-btn" type="button" aria-label="Open command menu"></button>
-        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle light/dark mode"></button>
+        <button class="icon-btn" id="teacher-btn" type="button"></button>
+        <button class="icon-btn" id="theme-toggle" type="button"></button>
         <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false"></button>
       </div>
     </div>
   </header>
+  <div class="mobile-menu" id="mobile-menu" hidden></div>
 
-  <main id="main"></main>
+  <main id="main" tabindex="-1"></main>
 
-  <footer class="footer" id="footer">
-    <div class="container">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <a href="#hero" class="logo" id="footer-logo"></a>
-          <p class="muted" id="footer-text"></p>
-        </div>
-        <div class="footer-cols" id="footer-cols"></div>
-      </div>
-      <div class="footer-big" id="footer-big" aria-hidden="true"></div>
-      <div class="footer-bottom">
-        <span id="copyright"></span>
-        <span class="footer-right"><span id="footer-time" class="mono"></span><a href="/admin" class="admin-link" id="admin-link" hidden>Admin</a></span>
-      </div>
-    </div>
-  </footer>
+  <footer class="footer" id="footer"></footer>
 
-  <button class="to-top" id="to-top" type="button" aria-label="Back to top"></button>
+  <button class="to-top" id="to-top" type="button"></button>
 
-  <!-- command palette -->
   <div class="cmdk" id="cmdk" role="dialog" aria-modal="true" aria-label="Command menu" hidden>
     <div class="cmdk-panel">
-      <div class="cmdk-search"><span id="cmdk-ic"></span><input id="cmdk-input" type="text" placeholder="Type a command or search…" autocomplete="off" spellcheck="false" /><kbd>esc</kbd></div>
+      <div class="cmdk-search"><span id="cmdk-ic"></span><input id="cmdk-input" type="text" autocomplete="off" spellcheck="false" /><kbd>esc</kbd></div>
       <div class="cmdk-list" id="cmdk-list" role="listbox"></div>
-      <div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> select</span><span class="mono">aarav.exe</span></div>
+      <div class="cmdk-foot" id="cmdk-foot"></div>
     </div>
   </div>
 
@@ -97,9 +102,13 @@
     <button class="icon-btn lb-nav lb-next" id="lb-next" type="button" aria-label="Next"></button>
   </div>
 
+  <div class="modal" id="modal" role="dialog" aria-modal="true" hidden><div class="modal-card" id="modal-card"></div></div>
+
+  <div class="teacher" id="teacher" hidden></div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="/js/icons.js"></script>
-  <script src="/js/main.js"></script>
+  <script src="/js/icons.js?v={{V}}" defer></script>
+  <script src="/js/main.js?v={{V}}" defer></script>
 </body>
 </html>

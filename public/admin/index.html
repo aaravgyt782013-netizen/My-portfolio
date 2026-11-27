@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex, nofollow" />
   <title>Admin Panel · Portfolio</title>
   <link rel="icon" href="/favicon.svg" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
-  <link rel="stylesheet" href="/admin/admin.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Grotesk:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="/admin/admin.css?v={{V}}" />
   <script>if (!localStorage.getItem('pf-admin-token')) location.replace('/admin/login');</script>
 </head>
 <body class="admin-body">
@@ -58,7 +58,7 @@
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <input type="file" id="hidden-file" hidden />
 
-  <script src="/js/icons.js"></script>
-  <script src="/admin/admin.js"></script>
+  <script src="/js/icons.js?v={{V}}"></script>
+  <script src="/admin/admin.js?v={{V}}"></script>
 </body>
 </html>

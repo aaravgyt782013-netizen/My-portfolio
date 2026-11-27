@@ -10,6 +10,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const compression = require('compression');
 const multer = require('multer');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -62,12 +63,22 @@ function mergeDefaults(def, cur) {
 }
 function getContent() {
   const def = defaults();
-  const cur = readJSON(CONTENT_FILE, null);
+  let cur = readJSON(CONTENT_FILE, null);
   if (!cur) return def;
+  // one-time migration: content saved by an older version (single-page layout) is backed up
+  // and replaced by the new multi-page defaults — only the social links are carried over.
+  if (!(Number(cur.version) >= Number(def.version || 0))) {
+    try { fs.writeFileSync(CONTENT_FILE.replace(/\.json$/, '') + '.v' + (cur.version || 2) + '-backup.json', JSON.stringify(cur, null, 2)); } catch (e) { /* ignore */ }
+    cur = { ...def, socials: Array.isArray(cur.socials) && cur.socials.length ? cur.socials : def.socials };
+    try { writeJSON(CONTENT_FILE, cur); } catch (e) { /* ignore */ }
+    console.log('ℹ️  Migrated saved content to version ' + def.version + ' (old copy kept as a backup file).');
+  }
   const merged = mergeDefaults(def, cur);
-  // make sure every known section exists in the section list
-  if (Array.isArray(merged.sections) && Array.isArray(def.sections)) {
-    for (const s of def.sections) if (!merged.sections.find((x) => x.id === s.id)) merged.sections.push({ ...s, enabled: false });
+  // make sure every known page exists in the page list (new pages appear switched off)
+  if (!Array.isArray(merged.pages)) merged.pages = def.pages;
+  else if (Array.isArray(def.pages)) {
+    for (const p of def.pages) if (!merged.pages.find((x) => x.id === p.id)) merged.pages.push({ ...p, enabled: false });
+    merged.pages = merged.pages.map((p) => ({ ...(def.pages.find((d) => d.id === p.id) || {}), ...p }));
   }
   return merged;
 }
@@ -119,6 +130,7 @@ setInterval(() => { const now = Date.now(); for (const [k, b] of buckets) if (no
 const app = express();
 app.set('trust proxy', true);
 app.disable('x-powered-by');
+app.use(compression()); // gzip everything — makes HTML/JS/CSS ~4x smaller over the wire
 app.use(express.json({ limit: '5mb' }));
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
@@ -183,7 +195,7 @@ admin.use(requireAuth);
 
 admin.put('/content', (req, res) => {
   const body = req.body;
-  if (!isObj(body) || !isObj(body.site) || !isObj(body.theme) || !Array.isArray(body.sections)) {
+  if (!isObj(body) || !isObj(body.site) || !isObj(body.theme) || !Array.isArray(body.pages)) {
     return res.status(400).json({ error: 'Invalid content structure.' });
   }
   writeJSON(CONTENT_FILE, body);
@@ -255,27 +267,72 @@ app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 /* ------------------------------ pages / static ----------------------------- */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-// Public page: inject SEO tags + content so the page renders instantly with no flash.
-app.get(['/', '/index.html'], (req, res) => {
-  const c = getContent();
-  const html = fs.readFileSync(path.join(PUBLIC_DIR, 'index.html'), 'utf8')
-    .replaceAll('{{TITLE}}', esc(c.site?.title))
-    .replaceAll('{{DESCRIPTION}}', esc(c.site?.description))
-    .replaceAll('{{KEYWORDS}}', esc(c.site?.keywords))
-    .replaceAll('{{FAVICON}}', esc(c.site?.favicon || '/favicon.png'))
-    .replaceAll('{{OG_IMAGE}}', esc(c.site?.ogImage || ''))
+// Cache-busting version for CSS/JS: changes whenever the files change, so browsers can cache them for a year.
+function fileHash(rel) {
+  try { return crypto.createHash('md5').update(fs.readFileSync(path.join(PUBLIC_DIR, rel))).digest('hex').slice(0, 8); } catch { return '0'; }
+}
+const ASSET_VERSION = fileHash('css/style.css') + fileHash('js/main.js').slice(0, 4) + fileHash('js/icons.js').slice(0, 4);
+const ADMIN_VERSION = fileHash('admin/admin.js') + fileHash('admin/admin.css').slice(0, 4) + fileHash('js/icons.js').slice(0, 4);
+const SHELL = fs.readFileSync(path.join(PUBLIC_DIR, 'index.html'), 'utf8');
+const ADMIN_SHELL = fs.readFileSync(path.join(PUBLIC_DIR, 'admin', 'index.html'), 'utf8');
+
+/** Find which page a URL path belongs to, using the slugs set in the admin panel. */
+function pageForPath(c, urlPath) {
+  const slug = decodeURIComponent(urlPath).replace(/^\/+|\/+$/g, '').toLowerCase();
+  const pages = (c.pages || []).filter((p) => p.enabled);
+  if (!slug || slug === 'index.html') return pages.find((p) => p.id === 'home') || null;
+  return pages.find((p) => p.id !== 'home' && String(p.slug || p.id).toLowerCase() === slug) || null;
+}
+
+function renderShell(c, page, origin) {
+  const site = c.site || {};
+  let title = site.title || '';
+  if (!page) title = (c.notFound?.slipTitle || '404') + ' — ' + (site.title || '');
+  else if (page.seoTitle) title = page.seoTitle;
+  else if (page.id !== 'home') title = page.label + ' — ' + (site.title || '');
+  const preload = [];
+  if (page && page.id === 'home' && c.hero?.avatar) preload.push(`<link rel="preload" as="image" href="${esc(c.hero.avatar)}" fetchpriority="high" />`);
+  if (page && origin) preload.push(`<link rel="canonical" href="${esc(origin + '/' + (page.id === 'home' ? '' : page.slug || page.id))}" />`);
+  const description = page && page.id !== 'home' && page.blurb ? page.blurb + ' — ' + (site.description || '') : site.description;
+  return SHELL
+    .replaceAll('{{TITLE}}', esc(title))
+    .replaceAll('{{DESCRIPTION}}', esc(description))
+    .replaceAll('{{KEYWORDS}}', esc(site.keywords))
+    .replaceAll('{{FAVICON}}', esc(site.favicon || '/favicon.svg'))
+    .replaceAll('{{OG_IMAGE}}', esc(site.ogImage || ''))
     .replaceAll('{{THEME_MODE}}', c.theme?.mode === 'light' ? 'light' : 'dark')
-    .replace('/*{{CONTENT}}*/', 'window.__CONTENT__ = ' + JSON.stringify(c).replace(/</g, '\\u003c') + ';');
-  res.set('Cache-Control', 'no-store').type('html').send(html);
+    .replaceAll('{{V}}', ASSET_VERSION)
+    .replace('{{PRELOAD}}', preload.join(''))
+    .replace('{{CUSTOM_HEAD}}', typeof site.customHead === 'string' ? site.customHead : '')
+    .replace('/*{{CONTENT}}*/', () => 'window.__CONTENT__ = ' + JSON.stringify(c).replace(/</g, '\\u003c') + ';');
+}
+
+app.get(['/admin', '/admin/'], (req, res) => res.set('Cache-Control', 'no-store').type('html').send(ADMIN_SHELL.replaceAll('{{V}}', ADMIN_VERSION)));
+const LOGIN_SHELL = fs.readFileSync(path.join(PUBLIC_DIR, 'admin', 'login.html'), 'utf8');
+app.get('/admin/login', (req, res) => res.set('Cache-Control', 'no-store').type('html').send(LOGIN_SHELL.replaceAll('{{V}}', ADMIN_VERSION)));
+
+// versioned files (?v=...) are cached for a year; everything else for an hour
+const cacheHeaders = (res) => { if (res.req.query.v) res.set('Cache-Control', 'public, max-age=31536000, immutable'); };
+app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '30d', setHeaders: (res, p) => { if (p.endsWith('.svg')) res.set('Content-Security-Policy', "script-src 'none'"); } }));
+app.use('/assets', express.static(path.join(PUBLIC_DIR, 'assets'), { maxAge: '30d' }));
+app.use(express.static(PUBLIC_DIR, { index: false, maxAge: '1h', setHeaders: cacheHeaders }));
+
+// SEO helpers
+const originOf = (req) => req.protocol + '://' + req.get('host');
+app.get('/robots.txt', (req, res) => res.type('text/plain').send(`User-agent: *\nDisallow: /admin\nDisallow: /api\nSitemap: ${originOf(req)}/sitemap.xml\n`));
+app.get('/sitemap.xml', (req, res) => {
+  const c = getContent();
+  const urls = (c.pages || []).filter((p) => p.enabled).map((p) => `<url><loc>${esc(originOf(req) + '/' + (p.id === 'home' ? '' : p.slug || p.id))}</loc></url>`);
+  res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join('')}</urlset>`);
 });
 
-app.get(['/admin', '/admin/'], (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin', 'index.html')));
-app.get('/admin/login', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin', 'login.html')));
-
-app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '7d', setHeaders: (res, p) => { if (p.endsWith('.svg')) res.set('Content-Security-Policy', "script-src 'none'"); } }));
-app.use(express.static(PUBLIC_DIR, { index: false, maxAge: '1h' }));
-
-app.use((req, res) => res.status(404).type('html').send('<h1 style="font-family:sans-serif">404 — Page not found</h1><a href="/">Go home</a>'));
+// Every page (/, /about, /projects, …) is served from the same fast shell; the browser
+// then switches pages instantly without reloading. Unknown URLs get the 404 "detention slip".
+app.get(/.*/, (req, res) => {
+  const c = getContent();
+  const page = pageForPath(c, req.path);
+  res.status(page ? 200 : 404).set('Cache-Control', 'no-cache').type('html').send(renderShell(c, page, originOf(req)));
+});
 
 app.listen(PORT, HOST, () => {
   console.log(`✅ Portfolio running at http://localhost:${PORT}`);
