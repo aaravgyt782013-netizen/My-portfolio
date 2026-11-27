@@ -464,7 +464,20 @@
   };
 
   /* ---------- PHOTOS (memory box) ---------- */
-  function photoItems() { return ((C.photos && C.photos.items) || []).filter(function (x) { return x && x.image && !x.hidden; }); }
+  var photoAdmin = false;        // true when the site owner is logged in on this browser (verified with the server)
+  var adminCheck = null;
+  function adminToken() { try { return localStorage.getItem('pf-admin-token') || ''; } catch (e) { return ''; } }
+  function checkAdmin() {
+    if (window.self !== window.top || !adminToken()) return Promise.resolve(false); // never inside the admin live preview
+    if (!adminCheck) adminCheck = fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + adminToken() } }).then(function (r) { return r.ok; }).catch(function () { return false; });
+    return adminCheck;
+  }
+  /** [{it, k}] — k is the index in C.photos.items. Hidden memories are only listed for the admin. */
+  function photoEntries() {
+    return ((C.photos && C.photos.items) || []).map(function (it, k) { return { it: it, k: k }; })
+      .filter(function (x) { return x.it && (photoAdmin || (x.it.image && !x.it.hidden)); });
+  }
+  function photoItems() { return photoEntries().map(function (x) { return x.it; }); }
   function fmtDate(d) {
     if (!d) return '';
     var m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(String(d).trim());
@@ -474,43 +487,163 @@
   function yearOf(d) { var m = /(\d{4})/.exec(String(d || '')); return m ? m[1] : ''; }
   function noteColor(it, i) { var c = String(it.color || 'auto'); return /^[1-4]$/.test(c) ? c : String(i % 4 + 1); }
   P.photos = function () {
-    var ph = C.photos || {}, items = photoItems(), journal = ph.layout !== 'wall';
-    var years = []; items.forEach(function (it) { var y = yearOf(it.date); if (y && years.indexOf(y) < 0) years.push(y); });
+    var ph = C.photos || {}, entries = photoEntries(), journal = ph.layout !== 'wall';
+    var shown = entries.filter(function (x) { return !x.it.hidden; }).length;
+    var years = []; entries.forEach(function (x) { var y = yearOf(x.it.date); if (y && years.indexOf(y) < 0) years.push(y); });
     years.sort().reverse();
-    var bar = (ph.showCount !== false || (ph.yearFilter !== false && years.length > 1)) && items.length ?
+    var bar = (ph.showCount !== false || (ph.yearFilter !== false && years.length > 1)) && entries.length ?
       '<div class="mem-bar reveal">' +
-        (ph.showCount !== false ? '<span class="mem-count hand"><b id="mem-n">' + items.length + '</b> ' + esc(L('photos', 'memoriesWord')) + '</span>' : '<span></span>') +
+        (ph.showCount !== false ? '<span class="mem-count hand"><b id="mem-n">' + shown + '</b> ' + esc(L('photos', 'memoriesWord')) + '</span>' : '<span></span>') +
         (ph.yearFilter !== false && years.length > 1 ? '<div class="filters" id="mem-years"><button class="filter active" type="button" data-y="">' + esc(L('photos', 'all')) + '</button>' + years.map(function (y) { return '<button class="filter" type="button" data-y="' + y + '">' + y + '</button>'; }).join('') + '</div>' : '') +
       '</div>' : '';
-    var list = items.map(function (it, i) {
+    var adminBar = photoAdmin ? '<div class="mem-adminbar"><span>' + I.ui('pencil') + '<b>Edit mode</b> — you are logged in as admin. Changes go live for everyone.</span>' +
+      '<div><button type="button" class="btn btn-primary btn-sm" data-pa="add">' + I.ui('plus') + 'Add memory</button>' +
+      '<a class="btn btn-ghost btn-sm" href="/admin#photos" target="_blank" rel="noopener">' + I.ui('settings') + 'Admin panel</a></div></div>' : '';
+    var list = entries.map(function (x, i) {
+      var it = x.it;
       var date = ph.showDates !== false && it.date ? '<span class="mem-date mono">' + esc(L('photos', 'dateWord')) + ' ' + esc(fmtDate(it.date)) + '</span>' : '';
       var place = it.place ? '<span class="mem-place">' + esc(L('photos', 'place')) + ' ' + esc(it.place) + '</span>' : '';
       var photo = '<button class="polaroid mem-photo" type="button" data-i="' + i + '" style="--r:' + rot(i + 1, 1.1) + 'deg" aria-label="' + esc(L('photos', 'openPhoto')) + '">' +
-        '<span class="tape"></span>' + img(it.image, it.memory ? it.memory.slice(0, 80) : '') + '</button>';
-      var note = it.memory || date || place ? '<div class="mem-note c' + noteColor(it, i) + '" style="--r:' + rot(i + 4, .9) + 'deg"><span class="pin"></span>' +
+        '<span class="tape"></span>' + (it.image ? img(it.image, it.memory ? it.memory.slice(0, 80) : '') : '<span class="mem-noimg">' + I.ui('image') + '</span>') + '</button>';
+      var note = it.memory || date || place || photoAdmin ? '<div class="mem-note c' + noteColor(it, i) + '" style="--r:' + rot(i + 4, .9) + 'deg"><span class="pin"></span>' +
         (journal ? '<span class="mem-k mono">' + esc(L('photos', 'memoryTitle')) + '</span>' : '') +
-        (it.memory ? '<p class="hand">' + esc(it.memory).replace(/\n/g, '<br>') + '</p>' : '') +
+        (it.memory ? '<p class="hand">' + esc(it.memory).replace(/\n/g, '<br>') + '</p>' : (photoAdmin ? '<p class="hand mem-nonote">No note yet — tap Edit ✏️</p>' : '')) +
         (date || place ? '<div class="mem-meta">' + date + place + '</div>' : '') + '</div>' : '';
-      return '<article class="memory reveal' + (i % 2 ? ' flip' : '') + '" data-y="' + yearOf(it.date) + '">' + photo + note + (journal && i < items.length - 1 ? '<span class="mem-string" aria-hidden="true">' + D.arrow + '</span>' : '') + '</article>';
+      var tools = photoAdmin ? '<div class="mem-tools" data-k="' + x.k + '">' +
+        (it.hidden ? '<span class="mem-hidden-tag">' + I.ui('eye-off') + 'Hidden from visitors</span>' : '') +
+        '<button type="button" class="btn btn-ghost btn-sm" data-pa="edit">' + I.ui('pencil') + 'Edit</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" data-pa="hide">' + I.ui(it.hidden ? 'eye' : 'eye-off') + (it.hidden ? 'Show' : 'Hide') + '</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" data-pa="up" title="Move up"' + (i === 0 ? ' disabled' : '') + '>' + I.ui('chevron-up') + '</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" data-pa="down" title="Move down"' + (i === entries.length - 1 ? ' disabled' : '') + '>' + I.ui('chevron-down') + '</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm mem-del" data-pa="del">' + I.ui('trash-2') + 'Delete</button></div>' : '';
+      return '<article class="memory reveal' + (i % 2 ? ' flip' : '') + (it.hidden ? ' is-hidden' : '') + '" data-y="' + yearOf(it.date) + '">' + photo + note + tools + (journal && i < entries.length - 1 ? '<span class="mem-string" aria-hidden="true">' + D.arrow + '</span>' : '') + '</article>';
     }).join('');
-    return '<section class="page"><div class="container">' + pageHead('photos', ph) + bar +
-      (items.length ? '<div class="memories ' + (journal ? 'journal' : 'wall') + '" id="memories">' + list + '</div>'
+    return '<section class="page"><div class="container">' + pageHead('photos', ph) + adminBar + bar +
+      (entries.length ? '<div class="memories ' + (journal ? 'journal' : 'wall') + (photoAdmin ? ' editing' : '') + '" id="memories">' + list + '</div>'
         : '<div class="mem-empty reveal"><span class="pin"></span><p class="hand">' + esc(ph.emptyText || '') + '</p></div>') +
     '</div></section>';
   };
   M.photos = function () {
-    var items = photoItems();
-    var lb = items.map(function (it) { var meta = [fmtDate(it.date), it.place].filter(Boolean).join(' · '); return { image: it.image, caption: (it.memory || '') + (meta ? (it.memory ? '  —  ' : '') + meta : '') }; });
-    $$('.mem-photo').forEach(function (b) { b.addEventListener('click', function () { openLightbox(Number(b.dataset.i), lb); }); });
+    var entries = photoEntries();
+    var lb = entries.map(function (x) { var it = x.it, meta = [fmtDate(it.date), it.place].filter(Boolean).join(' · '); return { image: it.image, caption: (it.memory || '') + (meta ? (it.memory ? '  —  ' : '') + meta : '') }; });
+    $$('.mem-photo').forEach(function (b) { b.addEventListener('click', function () { var x = entries[Number(b.dataset.i)]; if (x && !x.it.image && photoAdmin) { editMemory(x.k); return; } openLightbox(Number(b.dataset.i), lb); }); });
     var years = $('#mem-years');
     if (years) years.addEventListener('click', function (e) {
       var c = e.target.closest('.filter'); if (!c) return;
       $$('#mem-years .filter').forEach(function (x) { x.classList.toggle('active', x === c); });
       var y = c.dataset.y, n = 0;
-      $$('.memory').forEach(function (m) { var show = !y || m.dataset.y === y; m.hidden = !show; if (show) n++; });
+      $$('.memory').forEach(function (m) { var show = !y || m.dataset.y === y; m.hidden = !show; if (show && !m.classList.contains('is-hidden')) n++; });
       var ne = $('#mem-n'); if (ne) ne.textContent = n;
     });
+    if (photoAdmin) {
+      $('#main').addEventListener('click', onPhotoAdminClick);
+      onCleanup(function () { $('#main').removeEventListener('click', onPhotoAdminClick); });
+    } else {
+      checkAdmin().then(function (ok) { if (ok && currentId === 'photos' && !photoAdmin) { photoAdmin = true; rerenderPhotos(); } });
+    }
   };
+
+  /* ---- owner-only editing right on /photos (uses the same admin login + API as the admin panel) ---- */
+  function rerenderPhotos() {
+    var y = window.scrollY;
+    renderPage(true);
+    $$('.reveal').forEach(function (el) { el.classList.add('visible'); });
+    window.scrollTo(0, y);
+  }
+  function adminFetch(url, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ Authorization: 'Bearer ' + adminToken() }, opts.headers || {});
+    return fetch(url, opts).then(function (r) {
+      if (r.status === 401) { photoAdmin = false; adminCheck = null; rerenderPhotos(); throw new Error('Your admin login expired — log in again at /admin'); }
+      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || 'Could not save'); return j; });
+    });
+  }
+  /** Loads the newest saved content, applies fn(items) to it, saves it for everyone and re-renders. */
+  function changeMemories(fn, okMsg, expect) {
+    return fetch('/api/content', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (fresh) {
+      if (!fresh.photos) fresh.photos = { items: [] };
+      if (!Array.isArray(fresh.photos.items)) fresh.photos.items = [];
+      var items = fresh.photos.items;
+      if (expect && (!items[expect.k] || items[expect.k].image !== expect.image)) { var err = new Error('Memories were changed somewhere else — the page was refreshed, please try again'); err.stale = true; throw err; }
+      var removed = fn(items) || [];
+      return adminFetch('/api/admin/content', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(fresh) }).then(function () {
+        C = fresh; rerenderPhotos(); toast(okMsg);
+        setTimeout(function () { removeFiles(fresh, removed); }, 0);
+        return true;
+      });
+    }).catch(function (e) {
+      toast('⚠️ ' + e.message);
+      if (e.stale) closeModal();
+      else if (!$('#modal').hidden) return false; // keep the edit form (and what was typed) open
+      fetch('/api/content', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (c) { C = c; rerenderPhotos(); }).catch(function () {});
+      return false;
+    });
+  }
+  /** Deletes uploaded photo files that are no longer used anywhere on the site. */
+  function removeFiles(content, urls) {
+    var json = JSON.stringify(content);
+    urls.forEach(function (u) { if (/^\/uploads\//.test(u || '') && json.indexOf(JSON.stringify(u)) < 0) adminFetch('/api/admin/uploads/' + encodeURIComponent(u.slice(9)), { method: 'DELETE' }).catch(function () {}); });
+  }
+  function onPhotoAdminClick(e) {
+    var b = e.target.closest('[data-pa]'); if (!b || b.disabled) return;
+    var act = b.dataset.pa;
+    if (act === 'add') { editMemory(-1); return; }
+    var k = Number(b.closest('.mem-tools').dataset.k), items = C.photos.items, it = items[k];
+    if (!it) return;
+    var expect = { k: k, image: it.image };
+    if (act === 'edit') editMemory(k);
+    else if (act === 'hide') changeMemories(function (list) { list[k].hidden = !list[k].hidden; }, it.hidden ? 'Visible to everyone again 👀' : 'Hidden from visitors 🙈', expect);
+    else if (act === 'up' || act === 'down') {
+      // move past the neighbour that is actually shown on the page
+      var keys = photoEntries().map(function (x) { return x.k; }), pos = keys.indexOf(k), to = keys[pos + (act === 'up' ? -1 : 1)];
+      if (to === undefined) return;
+      changeMemories(function (list) { var m = list.splice(k, 1)[0]; list.splice(to, 0, m); }, act === 'up' ? 'Moved up ↑' : 'Moved down ↓', expect);
+    } else if (act === 'del') {
+      if (!confirm('Delete this memory? It disappears from /photos for everyone.')) return;
+      changeMemories(function (list) { var m = list.splice(k, 1)[0]; return [m.image]; }, 'Memory deleted 🗑️', expect);
+    }
+  }
+  function localDate() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function editMemory(k) {
+    var isNew = k < 0, it = isNew ? { image: '', memory: '', date: localDate(), place: '', color: 'auto', hidden: false } : JSON.parse(JSON.stringify(C.photos.items[k]));
+    var expect = isNew ? null : { k: k, image: C.photos.items[k].image };
+    var colors = [['auto', 'Auto'], ['1', 'Yellow'], ['2', 'Pink'], ['3', 'Blue'], ['4', 'Green']];
+    openModal('<button class="icon-btn modal-x" data-close aria-label="Close">' + I.ui('x') + '</button>' +
+      '<form class="m-body mem-edit" id="mem-edit">' +
+        '<h3>' + (isNew ? 'New memory 📸' : 'Edit memory ✏️') + '</h3>' +
+        '<div class="me-photo"><div class="me-img" id="me-img"' + (it.image ? ' style="background-image:url(\'' + esc(String(it.image).replace(/'/g, '%27')) + '\')"' : '') + '>' + (it.image ? '' : I.ui('image')) + '</div>' +
+          '<label class="btn btn-ghost btn-sm">' + I.ui('upload') + '<span id="me-up-t">' + (it.image ? 'Change photo' : 'Upload photo') + '</span><input type="file" accept="image/*" id="me-file" hidden></label></div>' +
+        '<label class="me-f"><span>Memory note</span><textarea id="me-memory" rows="5" placeholder="What happened here?">' + esc(it.memory || '') + '</textarea></label>' +
+        '<div class="me-row"><label class="me-f"><span>Date</span><input type="date" id="me-date" value="' + esc(/^\d{4}-\d{2}-\d{2}$/.test(it.date || '') ? it.date : '') + '"></label>' +
+          '<label class="me-f"><span>Place</span><input type="text" id="me-place" value="' + esc(it.place || '') + '" placeholder="Where was this?"></label></div>' +
+        '<div class="me-row"><label class="me-f"><span>Note colour</span><select id="me-color">' + colors.map(function (c) { return '<option value="' + c[0] + '"' + (String(it.color || 'auto') === c[0] ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
+          '<label class="me-check"><input type="checkbox" id="me-hidden"' + (it.hidden ? ' checked' : '') + '> Hide from visitors</label></div>' +
+        '<div class="me-foot"><button type="submit" class="btn btn-primary" id="me-save">' + I.ui('check') + (isNew ? 'Pin & publish' : 'Save changes') + '</button>' +
+          '<button type="button" class="btn btn-ghost" data-close>Cancel</button></div>' +
+      '</form>');
+    var oldImage = it.image;
+    $('#me-file').addEventListener('change', function () {
+      var f = this.files[0]; if (!f) return;
+      var fd = new FormData(); fd.append('files', f);
+      $('#me-up-t').textContent = 'Uploading…';
+      adminFetch('/api/admin/upload', { method: 'POST', body: fd }).then(function (j) {
+        it.image = j.files[0].url;
+        var box = $('#me-img'); box.style.backgroundImage = "url('" + it.image + "')"; box.innerHTML = '';
+        $('#me-up-t').textContent = 'Change photo';
+      }).catch(function (e) { $('#me-up-t').textContent = 'Upload photo'; toast('⚠️ ' + e.message); });
+    });
+    $('#mem-edit').addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!it.image) { toast('⚠️ Upload a photo first'); return; }
+      it.memory = $('#me-memory').value; it.date = $('#me-date').value; it.place = $('#me-place').value.trim();
+      it.color = $('#me-color').value; it.hidden = $('#me-hidden').checked;
+      $('#me-save').disabled = true;
+      changeMemories(function (list) {
+        if (isNew) { list.unshift(it); return []; }
+        list[k] = it; return oldImage !== it.image ? [oldImage] : [];
+      }, isNew ? 'Memory pinned 📌' : 'Memory saved ✓', expect).then(function (ok) { if (ok) closeModal(); else $('#me-save').disabled = false; });
+    });
+  }
 
   /* ---------- PLAYGROUND ---------- */
   P.playground = function () {
@@ -1330,7 +1463,7 @@
       else if (e.key === 'Escape') { if (teacherOn) toggleTeacher(); closeCmdk(); lb.hidden = true; closeModal(); setMenu(false); }
       else if (typing) return;
       else if (e.key === '/' && $('#cmdk').hidden) { e.preventDefault(); openCmdk(); }
-      else if (!e.metaKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === hot && $('#cmdk').hidden) toggleTeacher();
+      else if (!e.metaKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === hot && $('#cmdk').hidden && $('#modal').hidden) toggleTeacher();
       else if (!lb.hidden && e.key === 'ArrowRight') openLightbox(lbIndex + 1);
       else if (!lb.hidden && e.key === 'ArrowLeft') openLightbox(lbIndex - 1);
     });

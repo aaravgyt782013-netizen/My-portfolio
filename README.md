@@ -51,7 +51,8 @@ Fun extras:
 - **All Small Texts:** every button label, hint, placeholder and menu word on the site
 - **Colors & Theme:** chalkboard and notebook colors, paper and four sticky-note colors, 7 presets, Google Fonts (heading, body, handwriting, mono), text size, roundness, width, background pattern, and every effect on/off
 - **Custom code:** extra CSS and `<head>` HTML (analytics, verification tags)
-- **Photos (Memory Box):** "Pin & publish" a photo with its memory note, date, place and note colour in one step. It's saved to the server and goes live for every visitor straight away. You can edit, hide, reorder, duplicate, delete, bulk-add and sort by date, switch between journal and wall layouts, and choose what the 👓 specs button does (open Photos, teacher mode or hidden)
+- **Photos (Memory Box):** "Pin & publish" a photo with its memory note, date, place and note colour in one step. Every memory is shown as a card with **Edit, Hide/Show, Move up/down, Duplicate and Delete** buttons, and you can tick several to hide, show or delete them together. Every action is saved and goes live for everyone instantly. Deleting a memory also removes its photo file once nothing else uses it. You can also bulk-add photos, sort by date, switch between journal and wall layouts, and choose what the 👓 specs button does
+- **Edit right on /photos:** while you're logged in to the admin, `/photos` shows an *Edit mode* bar with **Add memory**, and every memory gets Edit / Hide / Move / Delete buttons. The edit popup lets you change the photo, note, date, place and colour. Visitors never see any of this
 - **Media:** upload (drag and drop), media library, bulk-add gallery photos
 - **Live preview** that follows the page you're editing (desktop and mobile views)
 - Inbox for contact-form messages, backup export/import, reset to defaults, `Ctrl/Cmd + S` to save

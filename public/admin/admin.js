@@ -613,15 +613,7 @@
     ] },
     { id: 'photos', page: 'photos', label: 'Photos (Memory Box)', icon: 'camera', intro: 'Your private-feeling memory box at /photos — the 👓 specs button in the top bar opens it in a new tab. Every photo gets a handwritten memory note beside it. Anything you pin or save here goes live for every visitor.', panels: [
       { title: '📌 Pin a new memory', render: renderPhotoQuickAdd },
-      { title: 'Your memories', hint: 'Edit any note, swap a photo, change the date/place, hide one for a while, reorder with the arrows, duplicate or delete. Remember to hit Save.', path: 'photos', render: renderPhotoTools, fields: [
-        { key: 'items', type: 'list', itemLabel: 'Memory', titleKey: 'memory', subKey: 'date', thumbKey: 'image', newItem: { image: '', memory: '', date: '', place: '', color: 'auto', hidden: false }, fields: [
-          { key: 'image', label: 'Photo', type: 'image' },
-          { key: 'memory', label: 'Memory note (shown beside the photo)', type: 'textarea', rows: 4, help: 'Write it like a diary — new lines are kept.' },
-          { key: 'date', label: 'Date', inputType: 'date', help: 'Optional. Used for the year filter.' },
-          { key: 'place', label: 'Place', placeholder: 'Delhi, school, the ground…' },
-          { key: 'color', label: 'Note colour', type: 'select', options: NOTE_COLORS },
-          { key: 'hidden', label: 'Hide this memory from visitors', type: 'toggle' }] }
-      ] },
+      { title: 'Your memories — edit, hide, move or delete', render: renderMemoryManager },
       { title: 'Page header & layout', path: 'photos', fields: pageHead([
         { key: 'layout', label: 'Layout', type: 'select', options: [{ value: 'journal', label: '📔 Journal — big photo with the note beside it (zig-zag)' }, { value: 'wall', label: '🧱 Wall — polaroid grid with the note pinned under each photo' }] },
         { key: 'emptyText', label: 'Text when there are no photos yet', full: true },
@@ -867,24 +859,150 @@
     var view = h('a', { class: 'a-btn', href: '/photos', target: '_blank', rel: 'noopener', html: I.ui('external-link') + 'Open /photos' });
     panel.appendChild(h('div', { class: 'quick', style: 'margin-top:1rem' }, [pin, view]));
   }
-  /* ---- Photos: bulk add + sort tools above the list ---- */
-  function renderPhotoTools(panel) {
-    var dz = dropzone(function (files) {
-      var arr = photosObj().items, n = 0;
-      files.forEach(function (f) { if (!/\.pdf$/i.test(f.name)) { arr.push({ image: f.url, memory: '', date: '', place: '', color: 'auto', hidden: false }); n++; } });
-      changed(); go('photos'); toast(n + ' photo(s) added at the bottom — write their memories, then Save');
-    }, 'image/*');
-    dz.querySelector('div').innerHTML = '<b>Bulk add photos</b> — click or drop several images, then write a memory for each below';
-    panel.appendChild(dz);
-    function sortBy(dir) {
-      photosObj().items.sort(function (a, b) { var x = a.date || '', y = b.date || ''; if (!x) return 1; if (!y) return -1; return dir * (x < y ? -1 : x > y ? 1 : 0); });
-      changed(); go('photos'); toast('Sorted — remember to save');
+  /* ---- Photos: visual memory manager (every change is published instantly) ---- */
+  function publishNow(msg) {
+    changed();
+    if (!isDirty()) return Promise.resolve();
+    return api('/api/admin/content', { method: 'PUT', json: state })
+      .then(function () { savedJSON = JSON.stringify(state); changed(); toast(msg || 'Saved & live on /photos'); })
+      .catch(function (e) { toast(e.message + ' — click Save to retry', 'err'); });
+  }
+  function uploadInUse(url) { return JSON.stringify(state).indexOf(JSON.stringify(url)) > -1; }
+  function removeUnusedUploads(urls) {
+    urls.forEach(function (u) {
+      if (!/^\/uploads\//.test(u || '') || uploadInUse(u)) return; // still used somewhere else on the site → keep it
+      api('/api/admin/uploads/' + encodeURIComponent(u.slice(9)), { method: 'DELETE' }).catch(function () {});
+    });
+  }
+  function renderMemoryManager(panel) {
+    var arr = photosObj().items;
+    var editing = null;            // the memory object being edited
+    var selected = new Set();      // memory objects ticked for bulk actions
+    var wrap = h('div', { class: 'mem-manager' });
+    panel.appendChild(h('p', { class: 'hint', html: 'Every button here <b>saves and publishes instantly</b> — visitors see the change on <a href="/photos" target="_blank" rel="noopener">/photos</a> right away. Tip: when you are logged in, you can also edit memories directly on the /photos page.' }));
+    panel.appendChild(wrap);
+
+    function btn(icon, text, fn, cls, title) {
+      return h('button', { type: 'button', class: 'a-btn sm' + (cls ? ' ' + cls : ''), title: title || text, html: I.ui(icon) + (text ? '<span>' + esc(text) + '</span>' : ''), onclick: fn });
     }
-    panel.appendChild(h('div', { class: 'quick', style: 'margin:.9rem 0 .4rem' }, [
-      h('button', { type: 'button', class: 'a-btn sm', html: I.ui('arrow-down') + 'Sort newest first', onclick: function () { sortBy(-1); } }),
-      h('button', { type: 'button', class: 'a-btn sm', html: I.ui('arrow-up') + 'Sort oldest first', onclick: function () { sortBy(1); } }),
-      h('button', { type: 'button', class: 'a-btn sm', html: I.ui('eye') + 'Show all hidden', onclick: function () { photosObj().items.forEach(function (x) { x.hidden = false; }); changed(); go('photos'); } })
-    ]));
+    function move(it, d) {
+      var i = arr.indexOf(it), j = i + d;
+      if (i < 0 || j < 0 || j >= arr.length) return;
+      arr.splice(j, 0, arr.splice(i, 1)[0]);
+      draw(); publishNow('Moved ' + (d < 0 ? 'up' : 'down'));
+    }
+    function del(list) {
+      if (!list.length) return;
+      if (!confirm(list.length === 1 ? 'Delete this memory? This removes it from /photos for everyone.' : 'Delete ' + list.length + ' memories? This removes them from /photos for everyone.')) return;
+      var imgs = list.map(function (x) { return x.image; });
+      list.forEach(function (x) { var i = arr.indexOf(x); if (i > -1) arr.splice(i, 1); selected.delete(x); if (editing === x) editing = null; });
+      draw();
+      publishNow(list.length === 1 ? 'Memory deleted' : list.length + ' memories deleted').then(function () { removeUnusedUploads(imgs); });
+    }
+    function setHidden(list, v) {
+      list.forEach(function (x) { x.hidden = v; });
+      draw(); publishNow(v ? (list.length > 1 ? list.length + ' memories hidden' : 'Hidden from visitors') : (list.length > 1 ? list.length + ' memories visible again' : 'Visible again'));
+    }
+    function sortBy(dir) {
+      arr.sort(function (a, b) { var x = a.date || '', y = b.date || ''; if (!x) return 1; if (!y) return -1; return dir * (x < y ? -1 : x > y ? 1 : 0); });
+      draw(); publishNow('Sorted ' + (dir < 0 ? 'newest' : 'oldest') + ' first');
+    }
+    function meta(it) {
+      var d = it.date ? (function () { try { return new Date(it.date + (it.date.length === 10 ? 'T00:00' : '')).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return it.date; } })() : '';
+      return [d, it.place].filter(Boolean).join(' · ');
+    }
+
+    function editForm(it, card) {
+      var before = JSON.stringify(it);
+      var box = h('div', { class: 'mc-edit' });
+      box.appendChild(renderFields([
+        { key: 'image', label: 'Photo', type: 'image' },
+        { key: 'memory', label: 'Memory note', type: 'textarea', rows: 5, help: 'New lines are kept.' },
+        { key: 'date', label: 'Date', inputType: 'date' },
+        { key: 'place', label: 'Place' },
+        { key: 'color', label: 'Note colour', type: 'select', options: NOTE_COLORS },
+        { key: 'hidden', label: 'Hide this memory from visitors', type: 'toggle' }
+      ], it));
+      var oldImg = it.image;
+      box.appendChild(h('div', { class: 'quick mc-edit-foot' }, [
+        btn('save', 'Save changes', function () {
+          editing = null; draw();
+          publishNow('Memory updated').then(function () { if (oldImg !== it.image) removeUnusedUploads([oldImg]); });
+        }, 'primary'),
+        btn('x', 'Cancel', function () {
+          var orig = JSON.parse(before); Object.keys(it).forEach(function (k) { delete it[k]; }); Object.assign(it, orig);
+          editing = null; changed(); draw();
+        }),
+        btn('trash-2', 'Delete', function () { del([it]); }, 'danger')
+      ]));
+      return box;
+    }
+
+    function draw() {
+      wrap.innerHTML = '';
+      var hiddenN = arr.filter(function (x) { return x.hidden; }).length;
+      // toolbar
+      var bar = h('div', { class: 'mm-bar' }, [
+        h('span', { class: 'mm-count', html: '<b>' + arr.length + '</b> memories' + (hiddenN ? ' · <span class="muted">' + hiddenN + ' hidden</span>' : '') }),
+        h('div', { class: 'mm-tools' }, [
+          btn('arrow-down', 'Newest first', function () { sortBy(-1); }),
+          btn('arrow-up', 'Oldest first', function () { sortBy(1); }),
+          arr.length ? btn('check', selected.size === arr.length ? 'Unselect all' : 'Select all', function () { if (selected.size === arr.length) selected.clear(); else arr.forEach(function (x) { selected.add(x); }); draw(); }) : null
+        ])
+      ]);
+      wrap.appendChild(bar);
+      if (selected.size) {
+        var sel = Array.from(selected);
+        wrap.appendChild(h('div', { class: 'mm-selbar' }, [
+          h('span', { text: selected.size + ' selected' }),
+          btn('eye-off', 'Hide', function () { setHidden(sel, true); }),
+          btn('eye', 'Show', function () { setHidden(sel, false); }),
+          btn('trash-2', 'Delete selected', function () { del(sel); }, 'danger'),
+          btn('x', 'Clear', function () { selected.clear(); draw(); })
+        ]));
+      }
+      if (!arr.length) { wrap.appendChild(h('div', { class: 'l-empty', text: 'No memories yet — pin your first one above 📸' })); }
+      var grid = h('div', { class: 'mem-grid' });
+      arr.forEach(function (it, i) {
+        var isEd = editing === it;
+        var card = h('div', { class: 'mem-card' + (it.hidden ? ' is-hidden' : '') + (isEd ? ' editing' : '') + (selected.has(it) ? ' selected' : '') });
+        var cb = h('input', { type: 'checkbox', 'aria-label': 'Select memory ' + (i + 1) }); cb.checked = selected.has(it);
+        cb.onchange = function () { if (cb.checked) selected.add(it); else selected.delete(it); draw(); };
+        var img = h('div', { class: 'mc-img', title: 'Edit', style: it.image ? "background-image:url('" + String(it.image).replace(/'/g, '%27') + "')" : '', onclick: function () { editing = it; draw(); } }, [
+          h('label', { class: 'mc-sel', onclick: function (e) { e.stopPropagation(); } }, cb),
+          h('span', { class: 'mc-num', text: '#' + (i + 1) }),
+          it.hidden ? h('span', { class: 'mc-badge', html: I.ui('eye-off') + 'Hidden' }) : null,
+          it.image ? null : h('span', { class: 'mc-noimg', html: I.ui('image') + 'No photo' })
+        ]);
+        card.appendChild(img);
+        card.appendChild(h('div', { class: 'mc-body' }, [
+          h('p', { class: 'mc-note' + (it.memory ? '' : ' empty'), text: it.memory || 'No memory note yet — click Edit to write one.' }),
+          meta(it) ? h('small', { class: 'mc-meta', text: meta(it) }) : null
+        ]));
+        card.appendChild(h('div', { class: 'mc-actions' }, [
+          btn('pencil', 'Edit', function () { editing = isEd ? null : it; draw(); }, isEd ? 'primary' : ''),
+          btn(it.hidden ? 'eye' : 'eye-off', it.hidden ? 'Show' : 'Hide', function () { setHidden([it], !it.hidden); }),
+          btn('chevron-up', '', function () { move(it, -1); }, i === 0 ? 'disabled' : '', 'Move up'),
+          btn('chevron-down', '', function () { move(it, 1); }, i === arr.length - 1 ? 'disabled' : '', 'Move down'),
+          btn('copy', '', function () { var c = clone(it); arr.splice(arr.indexOf(it) + 1, 0, c); editing = c; draw(); publishNow('Memory duplicated'); }, '', 'Duplicate'),
+          btn('trash-2', 'Delete', function () { del([it]); }, 'danger')
+        ]));
+        if (isEd) card.appendChild(editForm(it, card));
+        grid.appendChild(card);
+      });
+      wrap.appendChild(grid);
+      $$disabled(wrap);
+      // bulk upload
+      var dz = dropzone(function (files) {
+        var n = 0;
+        files.forEach(function (f) { if (!/\.pdf$/i.test(f.name)) { arr.push({ image: f.url, memory: '', date: '', place: '', color: 'auto', hidden: false }); n++; } });
+        draw(); publishNow(n + ' photo(s) added — click Edit on each to write its memory');
+      }, 'image/*');
+      dz.querySelector('div').innerHTML = '<b>Bulk add photos</b> — click or drop several images; then click Edit on each to write its memory';
+      wrap.appendChild(dz);
+    }
+    function $$disabled(root) { Array.prototype.forEach.call(root.querySelectorAll('.a-btn.disabled'), function (b) { b.disabled = true; }); }
+    draw();
   }
 
   function renderAllLabels(el) {
