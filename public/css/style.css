@@ -902,10 +902,9 @@ button, a, input, select, textarea, label { -webkit-tap-highlight-color: transpa
   .pola-wall { gap: 1.1rem .8rem; }
 }
 
-/* tiny phones (≤ 360px): the specs (photos) button stays, the theme switch moves into the ☰ menu, stickies go single column */
+/* tiny phones (≤ 360px): every top-bar button stays (search, specs → photos, theme, menu), just a bit smaller; stickies go single column */
 @media (max-width: 360px) {
   #teacher-btn:not(.specs-photos) { display: none; }
-  #teacher-btn.specs-photos ~ #theme-toggle { display: none; }
   .explore { grid-template-columns: 1fr; }
   .tool { padding-inline: .55rem; }
 }

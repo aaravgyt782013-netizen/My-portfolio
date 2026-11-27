@@ -35,7 +35,7 @@ Fun extras:
 - Tested from small 320px phones to 1920px monitors, including tablets and landscape phones. Nothing scrolls sideways or gets cut off.
 - Touch controls: the doodle board, paper toss, ID-card flip and swipe-through photo lightbox all work by finger. Hover effects never "stick" after a tap.
 - iPhone notch and home-bar safe areas are respected. Inputs don't trigger auto-zoom.
-- On small phones, teacher mode and the theme switch move into the ☰ menu.
+- On every screen the top bar keeps search, the 👓 specs button (→ Photos) and the light/dark switch. Teacher mode is also in the ☰ menu.
 - The admin panel works on a phone too: slide-out sidebar and full-screen live preview.
 
 **Fast loading**
