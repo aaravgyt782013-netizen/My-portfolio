@@ -1,200 +1,308 @@
 {
   "site": {
-    "title": "Aarav — Coder & Developer",
-    "description": "Portfolio of Aarav, a young coder and developer who builds websites, apps, bots and digital products.",
-    "keywords": "Aarav, developer, coder, portfolio, web developer, India",
+    "title": "Aarav — Developer & Creator | aarav.exe",
+    "description": "Aarav (aarav.exe) — a developer from India building fast, beautiful websites, apps, bots and games. Silent moves. Loud dreams.",
+    "keywords": "Aarav, aarav.exe, developer, web developer, portfolio, India, Delhi, discord bot, game developer",
     "logoText": "aarav",
+    "logoSuffix": ".exe",
     "logoImage": "",
-    "favicon": "/favicon.png",
-    "ogImage": "/assets/avatar.jpg",
-    "footerText": "Designed & built with lots of chai and code.",
-    "showAdminLink": false
+    "favicon": "/favicon.svg",
+    "ogImage": "/assets/profile.jpg",
+    "footerText": "Somewhere between dreams & reality. Crafted with code, coffee and silent moves.",
+    "footerBigText": "AARAV.EXE",
+    "showAdminLink": false,
+    "preloader": true,
+    "preloaderLines": [
+      "booting aarav.exe ...",
+      "loading dreams ......... [ok]",
+      "syncing reality ........ [ok]",
+      "compiling ideas ........ [ok]",
+      "access granted. welcome."
+    ],
+    "commandPalette": true
   },
   "theme": {
     "mode": "dark",
     "allowVisitorToggle": true,
-    "primary": "#8b5cf6",
-    "secondary": "#22d3ee",
-    "accent": "#f472b6",
-    "background": "#07060f",
-    "surface": "#12111f",
-    "text": "#ece9ff",
-    "muted": "#9a96b8",
-    "lightBackground": "#f7f6fc",
+    "primary": "#ff2d55",
+    "secondary": "#8b5cf6",
+    "accent": "#ff7a45",
+    "background": "#050507",
+    "surface": "#0e0e13",
+    "text": "#f4f4f6",
+    "muted": "#8d8d9b",
+    "lightBackground": "#f6f5f8",
     "lightSurface": "#ffffff",
-    "lightText": "#15122b",
-    "lightMuted": "#5d5a78",
+    "lightText": "#121218",
+    "lightMuted": "#5f5f6e",
     "fontHeading": "Space Grotesk",
     "fontBody": "Inter",
-    "radius": 18,
+    "fontMono": "JetBrains Mono",
+    "radius": 20,
     "animations": true,
+    "heroEffect": "web",
+    "customCursor": true,
     "cursorGlow": true,
-    "backgroundGrid": true
+    "backgroundGrid": true,
+    "grain": true,
+    "scrollProgress": true,
+    "tiltCards": true,
+    "magneticButtons": true
   },
   "sections": [
     { "id": "hero", "label": "Home", "enabled": true },
     { "id": "about", "label": "About", "enabled": true },
-    { "id": "skills", "label": "Skills", "enabled": true },
-    { "id": "projects", "label": "Projects", "enabled": true },
-    { "id": "products", "label": "Products", "enabled": true },
+    { "id": "services", "label": "Services", "enabled": true },
+    { "id": "skills", "label": "Stack", "enabled": true },
+    { "id": "projects", "label": "Work", "enabled": true },
+    { "id": "products", "label": "Store", "enabled": true },
     { "id": "experience", "label": "Journey", "enabled": true },
     { "id": "gallery", "label": "Gallery", "enabled": true },
-    { "id": "testimonials", "label": "Testimonials", "enabled": true },
+    { "id": "testimonials", "label": "Reviews", "enabled": false },
     { "id": "contact", "label": "Contact", "enabled": true }
   ],
   "hero": {
-    "greeting": "Hey there, I'm",
+    "greeting": "hello world, i'm",
     "name": "Aarav",
-    "roles": ["Full-Stack Developer", "App Builder", "Bot Maker", "Creator"],
-    "tagline": "I turn ideas into fast, beautiful websites, apps and tools. Coding since I was a kid — building things people actually use.",
-    "avatar": "/assets/avatar.jpg",
+    "roles": ["Full-Stack Developer", "Game Builder", "Discord Bot Maker", "UI Designer", "A different kind of ordinary"],
+    "tagline": "I build fast, beautiful websites, apps, bots and games — quietly, obsessively, pixel by pixel. Silent moves. Loud dreams.",
+    "visual": "terminal",
+    "avatar": "/assets/profile.jpg",
     "backgroundImage": "",
     "availableBadge": true,
-    "availableText": "Available for freelance work",
-    "primaryButtonText": "See my work",
+    "availableText": "Available for freelance projects",
+    "primaryButtonText": "View my work",
     "primaryButtonLink": "#projects",
-    "secondaryButtonText": "Contact me",
+    "secondaryButtonText": "Let's talk",
     "secondaryButtonLink": "#contact",
-    "showSocials": true
+    "showSocials": true,
+    "terminalTitle": "aarav.exe — zsh",
+    "terminalIntro": [
+      { "command": "whoami", "output": "aarav — developer · creator · dreamer" },
+      { "command": "cat interests.txt", "output": "⚽ CR7  ·  🎮 gaming  ·  🕷️ spider-verse  ·  💻 code" },
+      { "command": "echo $MOTTO", "output": "silent moves. loud dreams." }
+    ],
+    "terminalCommands": [
+      { "command": "motto", "output": "Silent moves. Loud dreams. ♡" },
+      { "command": "cr7", "output": "SIUUUU! ⚽ Hard work beats talent when talent doesn't work hard." },
+      { "command": "spider", "output": "🕷️ With great code comes great responsibility." },
+      { "command": "hire", "output": "Let's build something loud → scroll to #contact or email me." },
+      { "command": "game", "output": "🎮 Currently grinding ranked. Ask me for a 1v1." }
+    ],
+    "stats": [
+      { "value": "25+", "label": "Projects shipped" },
+      { "value": "3+", "label": "Years coding" },
+      { "value": "100%", "label": "Passion" }
+    ]
+  },
+  "marquee": {
+    "enabled": true,
+    "items": [
+      { "name": "JavaScript", "icon": "javascript" },
+      { "name": "TypeScript", "icon": "typescript" },
+      { "name": "React", "icon": "react" },
+      { "name": "Next.js", "icon": "nextjs" },
+      { "name": "Node.js", "icon": "nodejs" },
+      { "name": "Python", "icon": "python" },
+      { "name": "Tailwind", "icon": "tailwind" },
+      { "name": "MongoDB", "icon": "mongodb" },
+      { "name": "Firebase", "icon": "firebase" },
+      { "name": "Three.js", "icon": "threejs" },
+      { "name": "Discord.js", "icon": "discord" },
+      { "name": "Git", "icon": "git" },
+      { "name": "Figma", "icon": "figma" },
+      { "name": "Unity", "icon": "unity" },
+      { "name": "Vercel", "icon": "vercel" },
+      { "name": "Linux", "icon": "linux" }
+    ]
   },
   "about": {
-    "heading": "About me",
-    "subheading": "A little bit about who I am",
-    "bio": "I'm Aarav, a self-taught coder and developer from India. I love building things on the internet — from slick websites and web apps to Discord bots and automation tools.\n\nWhen I'm not coding, you'll find me sharing my builds on Instagram, learning new tech, gaming, or planning my next big project.",
-    "photo": "/assets/avatar.jpg",
+    "heading": "A different kind of ordinary.",
+    "subheading": "Somewhere between dreams & reality — that's where I build.",
+    "bio": "I'm Aarav, a self-taught developer from Delhi, India. I fell in love with code because it lets me turn the wild ideas in my head into real things people can click, play and use.\n\nI design and build websites, web apps, Discord bots and small games — with a big focus on speed, clean design and the tiny details most people never notice. I don't talk much about what I'm building. I just ship it.",
+    "photo": "/assets/profile.jpg",
     "location": "Delhi, India",
+    "timezone": "Asia/Kolkata",
+    "quote": "Silent moves. Loud dreams.",
     "resumeText": "Download CV",
     "resumeLink": "",
+    "currently": [
+      { "label": "Building", "value": "Next-gen portfolio & a browser game" },
+      { "label": "Learning", "value": "TypeScript, Three.js & system design" },
+      { "label": "Playing", "value": "Ranked matches after commits 🎮" }
+    ],
+    "interests": [
+      { "emoji": "⚽", "title": "CR7 forever", "text": "Discipline, hard work and never settling — Ronaldo's mindset, in code." },
+      { "emoji": "🎮", "title": "Gamer", "text": "Games taught me strategy, patience and how great UX should feel." },
+      { "emoji": "🕷️", "title": "Spider-verse", "text": "A different kind of ordinary. With great code comes great responsibility." },
+      { "emoji": "🥀", "title": "Dreamer", "text": "Somewhere between dreams & reality — that's where the best ideas live." }
+    ],
     "stats": [
       { "value": "3+", "label": "Years coding" },
       { "value": "25+", "label": "Projects built" },
       { "value": "10+", "label": "Happy clients" },
-      { "value": "∞", "label": "Cups of chai" }
+      { "value": "1000+", "label": "Commits pushed" }
+    ]
+  },
+  "services": {
+    "heading": "What I do",
+    "subheading": "From idea to launch — design, code and everything in between.",
+    "items": [
+      { "icon": "monitor", "title": "Websites & Landing pages", "description": "Lightning-fast, responsive, animated websites that make people stop scrolling." },
+      { "icon": "app-window", "title": "Web Apps", "description": "Full-stack apps with auth, dashboards, databases and real-time features." },
+      { "icon": "bot", "title": "Discord Bots", "description": "Moderation, economy, music, tickets & custom commands — built for your server." },
+      { "icon": "gamepad-2", "title": "Browser Games", "description": "Small, addictive web games with smooth controls and neon vibes." },
+      { "icon": "pen-tool", "title": "UI / UX Design", "description": "Clean interfaces and design systems designed in Figma, built pixel-perfect." },
+      { "icon": "zap", "title": "Automation", "description": "Scripts & tools that save hours — scrapers, workflows and integrations." }
     ]
   },
   "skills": {
-    "heading": "Skills & tools",
-    "subheading": "The tech I use to bring ideas to life",
+    "heading": "Tech stack",
+    "subheading": "The tools I use to bring ideas to life.",
     "items": [
       { "name": "HTML & CSS", "level": 95, "category": "Frontend" },
-      { "name": "JavaScript", "level": 90, "category": "Frontend" },
-      { "name": "React / Next.js", "level": 82, "category": "Frontend" },
-      { "name": "Tailwind CSS", "level": 88, "category": "Frontend" },
-      { "name": "Node.js & Express", "level": 85, "category": "Backend" },
+      { "name": "JavaScript / TypeScript", "level": 90, "category": "Frontend" },
+      { "name": "React / Next.js", "level": 84, "category": "Frontend" },
+      { "name": "Tailwind CSS", "level": 90, "category": "Frontend" },
+      { "name": "Node.js & Express", "level": 86, "category": "Backend" },
       { "name": "Python", "level": 80, "category": "Backend" },
-      { "name": "MongoDB / SQL", "level": 75, "category": "Backend" },
-      { "name": "Git & GitHub", "level": 88, "category": "Tools" },
-      { "name": "Figma", "level": 70, "category": "Tools" },
-      { "name": "Discord.js", "level": 85, "category": "Tools" }
+      { "name": "MongoDB / Firebase", "level": 78, "category": "Backend" },
+      { "name": "REST APIs", "level": 85, "category": "Backend" },
+      { "name": "Git & GitHub", "level": 88, "category": "Tools & more" },
+      { "name": "Discord.js", "level": 90, "category": "Tools & more" },
+      { "name": "Figma", "level": 74, "category": "Tools & more" },
+      { "name": "Unity / Game dev", "level": 65, "category": "Tools & more" }
     ]
   },
   "projects": {
-    "heading": "Featured projects",
-    "subheading": "Some things I've designed and built",
+    "heading": "Selected work",
+    "subheading": "A few things I've designed, built and shipped.",
     "items": [
       {
         "title": "Nebula Dashboard",
-        "description": "A real-time analytics dashboard with beautiful charts, dark mode and role-based access.",
+        "description": "A real-time analytics dashboard with live charts, dark mode, role-based access and blazing-fast filtering.",
         "image": "/assets/project-1.jpg",
-        "tags": ["React", "Node.js", "MongoDB"],
+        "tags": ["Next.js", "Node.js", "MongoDB"],
+        "year": "2026",
         "liveUrl": "https://example.com",
-        "codeUrl": "https://github.com/",
+        "codeUrl": "https://github.com/aaravgyt782013-netizen",
         "featured": true
       },
       {
-        "title": "Chatly",
-        "description": "A fast, minimal chat app with rooms, typing indicators and image sharing.",
+        "title": "Neon Runner",
+        "description": "A fast-paced cyberpunk platformer that runs right in the browser — rooftops, combos and a global leaderboard.",
         "image": "/assets/project-2.jpg",
-        "tags": ["Socket.io", "Express", "PWA"],
+        "tags": ["JavaScript", "Canvas", "Game"],
+        "year": "2026",
         "liveUrl": "https://example.com",
-        "codeUrl": "https://github.com/",
+        "codeUrl": "https://github.com/aaravgyt782013-netizen",
+        "featured": false
+      },
+      {
+        "title": "GOAT Stats",
+        "description": "A football stats tracker with player heatmaps, goal timelines and head-to-head comparisons. SIUUU.",
+        "image": "/assets/project-3.jpg",
+        "tags": ["React", "API", "Charts"],
+        "year": "2025",
+        "liveUrl": "https://example.com",
+        "codeUrl": "https://github.com/aaravgyt782013-netizen",
         "featured": false
       },
       {
         "title": "Study Buddy AI",
-        "description": "An AI helper that explains concepts, makes quizzes and summarizes notes for students.",
-        "image": "/assets/project-3.jpg",
+        "description": "An AI study companion that explains concepts, generates quizzes and summarizes notes in seconds.",
+        "image": "/assets/project-4.jpg",
         "tags": ["Python", "AI", "Next.js"],
+        "year": "2025",
         "liveUrl": "",
-        "codeUrl": "https://github.com/",
+        "codeUrl": "https://github.com/aaravgyt782013-netizen",
         "featured": false
       }
     ]
   },
   "products": {
-    "heading": "My products",
-    "subheading": "Templates, tools and resources I've made for you",
+    "heading": "Store & services",
+    "subheading": "Templates, bots and custom builds — ready when you are.",
     "items": [
       {
-        "name": "Starter Website Pack",
-        "description": "10 modern, responsive landing page templates. Copy, paste, launch.",
+        "name": "Dark UI Template Pack",
+        "description": "10 premium, animated landing page templates. Fully responsive. Copy, paste, launch.",
         "image": "/assets/product-1.jpg",
         "price": "₹499",
         "badge": "Bestseller",
-        "buttonText": "Get it",
+        "features": ["10 templates", "HTML + Tailwind", "Free updates"],
+        "buttonText": "Get it now",
         "link": "https://example.com"
       },
       {
         "name": "Custom Discord Bot",
-        "description": "Moderation, music, levels and custom commands — built just for your server.",
+        "description": "Your own bot with moderation, levels, tickets, music & custom commands — hosted and ready.",
         "image": "/assets/product-2.jpg",
         "price": "From ₹999",
-        "badge": "Service",
+        "badge": "Popular",
+        "features": ["Custom commands", "Dashboard", "24/7 hosting help"],
         "buttonText": "Order now",
         "link": "#contact"
       },
       {
-        "name": "Code From Zero (E-book)",
-        "description": "My beginner-friendly guide to learning web development from scratch.",
+        "name": "Website Design & Build",
+        "description": "A custom website for your brand, channel or business — designed and coded from scratch.",
         "image": "/assets/product-3.jpg",
-        "price": "Free",
-        "badge": "New",
-        "buttonText": "Download",
-        "link": "https://example.com"
+        "price": "From ₹2,999",
+        "badge": "Service",
+        "features": ["Custom design", "SEO ready", "Admin panel"],
+        "buttonText": "Start a project",
+        "link": "#contact"
       }
     ]
   },
   "experience": {
-    "heading": "My journey",
-    "subheading": "How I got here",
+    "heading": "The journey",
+    "subheading": "Every expert was once a beginner who refused to quit.",
     "items": [
       {
         "period": "2026 — Now",
         "role": "Freelance Developer",
         "company": "Self-employed",
-        "description": "Building websites, bots and tools for creators and small businesses."
+        "description": "Designing and building websites, bots and tools for creators, gamers and small businesses."
       },
       {
         "period": "2025",
-        "role": "Open-source Contributor",
-        "company": "GitHub",
-        "description": "Contributed fixes and features to open-source JavaScript projects."
+        "role": "Open-source & Game Dev",
+        "company": "GitHub · itch.io",
+        "description": "Contributed to open-source JavaScript projects and shipped my first browser games."
+      },
+      {
+        "period": "2024",
+        "role": "First paid project",
+        "company": "Discord community",
+        "description": "Built a custom Discord bot for a gaming server — and realized code could be a career."
       },
       {
         "period": "2023",
-        "role": "Wrote my first line of code",
-        "company": "Hello, World!",
-        "description": "Started with HTML & CSS, fell in love with building things, never stopped."
+        "role": "console.log('hello world')",
+        "company": "Where it all began",
+        "description": "Started with HTML & CSS, fell in love with building things, and never stopped."
       }
     ]
   },
   "gallery": {
-    "heading": "Gallery",
-    "subheading": "Moments, setups and builds — follow along on Instagram",
-    "instagramHandle": "@aarav",
-    "instagramUrl": "https://instagram.com/",
+    "heading": "Off the clock",
+    "subheading": "Setups, builds and the things that inspire me.",
+    "instagramHandle": "@aaravg782013.exe",
+    "instagramUrl": "https://www.instagram.com/aaravg782013.exe/",
     "items": [
-      { "image": "/assets/avatar.jpg", "caption": "That's me 👋", "link": "" },
-      { "image": "/assets/project-1.jpg", "caption": "Dashboard build", "link": "" },
-      { "image": "/assets/project-2.jpg", "caption": "Chat app in progress", "link": "" },
-      { "image": "/assets/product-2.jpg", "caption": "Bot mascot", "link": "" },
-      { "image": "/assets/project-3.jpg", "caption": "Playing with AI", "link": "" },
-      { "image": "/assets/product-3.jpg", "caption": "Writing my e-book", "link": "" }
+      { "image": "/assets/profile.jpg", "caption": "Silent moves. Loud dreams.", "link": "" },
+      { "image": "/assets/gallery-setup.jpg", "caption": "Where the magic happens", "link": "" },
+      { "image": "/assets/gallery-football.jpg", "caption": "⚽ CR7 mentality", "link": "" },
+      { "image": "/assets/project-2.jpg", "caption": "🎮 Neon Runner in progress", "link": "" },
+      { "image": "/assets/project-4.jpg", "caption": "Experimenting with AI", "link": "" },
+      { "image": "/assets/product-2.jpg", "caption": "Bot mascot v2", "link": "" }
     ]
   },
   "testimonials": {
     "heading": "Kind words",
-    "subheading": "What people say about working with me",
+    "subheading": "What people say about working with me.",
     "items": [
       {
         "name": "Rohan S.",
@@ -211,20 +319,20 @@
     ]
   },
   "contact": {
-    "heading": "Let's build something",
-    "subheading": "Got a project, idea or just want to say hi? My inbox is always open.",
+    "heading": "Let's build something loud.",
+    "subheading": "Have a project, an idea or just want to talk football and games? My inbox is always open.",
     "email": "hello@example.com",
     "phone": "",
     "whatsapp": "",
     "location": "Delhi, India",
     "formEnabled": true,
-    "successMessage": "Thanks! Your message has been sent — I'll get back to you soon."
+    "successMessage": "Message received ✓ — I'll get back to you soon. Silent moves, fast replies."
   },
   "socials": [
-    { "platform": "instagram", "label": "Instagram", "url": "https://instagram.com/" },
+    { "platform": "instagram", "label": "Instagram", "url": "https://www.instagram.com/aaravg782013.exe/" },
     { "platform": "github", "label": "GitHub", "url": "https://github.com/aaravgyt782013-netizen" },
+    { "platform": "discord", "label": "Discord", "url": "https://discord.com/" },
     { "platform": "youtube", "label": "YouTube", "url": "https://youtube.com/" },
-    { "platform": "linkedin", "label": "LinkedIn", "url": "https://linkedin.com/" },
-    { "platform": "discord", "label": "Discord", "url": "https://discord.com/" }
+    { "platform": "email", "label": "Email", "url": "mailto:hello@example.com" }
   ]
 }

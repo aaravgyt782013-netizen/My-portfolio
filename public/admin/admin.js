@@ -273,7 +273,7 @@
         ]);
         var headEls = [];
         if (f.thumbKey) headEls.push(h('span', { class: 'l-thumb', style: it[f.thumbKey] ? "background-image:url('" + String(it[f.thumbKey]).replace(/'/g, '%27') + "')" : '' }));
-        if (f.iconKey) headEls.push(h('span', { class: 'l-thumb', style: 'display:grid;place-items:center', html: I.social(it[f.iconKey]) }));
+        if (f.iconKey) headEls.push(h('span', { class: 'l-thumb', style: 'display:grid;place-items:center', html: f.iconType === 'ui' ? I.ui(it[f.iconKey]) : I.social(it[f.iconKey]) }));
         headEls.push(titleEl, actions, h('span', { class: 'chev', html: I.ui('chevron-down') }));
         var head = h('div', { class: 'l-head' }, headEls);
         head.onclick = function () { item.classList.toggle('open'); if (item.classList.contains('open')) openSet.add(it); else openSet.delete(it); };
@@ -310,6 +310,8 @@
   /* ======================= schema ======================= */
   var FONTS = ['Inter', 'Space Grotesk', 'Poppins', 'Outfit', 'Sora', 'Manrope', 'DM Sans', 'Plus Jakarta Sans', 'Montserrat', 'Raleway', 'Rubik', 'Nunito', 'Lexend', 'Urbanist', 'Syne', 'Clash Display', 'Lato', 'Open Sans', 'Roboto', 'Fira Code', 'JetBrains Mono', 'Playfair Display', 'Bebas Neue'];
   var PRESETS = [
+    { name: 'Rose Noir', primary: '#ff2d55', secondary: '#8b5cf6', accent: '#ff7a45', background: '#050507', surface: '#0e0e13', text: '#f4f4f6', muted: '#8d8d9b' },
+    { name: 'Spider-Verse', primary: '#e11d2e', secondary: '#2563eb', accent: '#facc15', background: '#06060c', surface: '#0f1020', text: '#f5f6ff', muted: '#8c8fae' },
     { name: 'Violet Neon', primary: '#8b5cf6', secondary: '#22d3ee', accent: '#f472b6', background: '#07060f', surface: '#12111f', text: '#ece9ff', muted: '#9a96b8' },
     { name: 'Ocean', primary: '#3b82f6', secondary: '#06b6d4', accent: '#a78bfa', background: '#050b16', surface: '#0d1626', text: '#e6f0ff', muted: '#8aa0bf' },
     { name: 'Sunset', primary: '#f97316', secondary: '#ec4899', accent: '#facc15', background: '#0f0806', surface: '#1b1110', text: '#fff1ea', muted: '#bf9b8f' },
@@ -317,6 +319,9 @@
     { name: 'Crimson', primary: '#ef4444', secondary: '#f59e0b', accent: '#f472b6', background: '#0d0607', surface: '#1a0e10', text: '#ffeceb', muted: '#bc9592' },
     { name: 'Mono', primary: '#e5e5e5', secondary: '#a3a3a3', accent: '#ffffff', background: '#0a0a0a', surface: '#161616', text: '#fafafa', muted: '#a1a1a1' }
   ];
+  var MONO_FONTS = ['JetBrains Mono', 'Fira Code', 'IBM Plex Mono', 'Space Mono', 'Roboto Mono', 'Source Code Pro', 'Geist Mono', 'DM Mono'];
+  var iconOptions = function () { return I.uiNames.map(function (n) { return { value: n, label: n }; }); };
+  var brandOptions = function () { return [{ value: '', label: '(no logo)' }].concat(I.brandNames.map(function (n) { return { value: n, label: n }; })); };
   var platformOptions = function () { return ['email', 'website', 'phone'].concat(I.brandNames).map(function (n) { return { value: n, label: n }; }); };
   var sectionText = function (extra) {
     return [{ key: 'heading', label: 'Section heading' }, { key: 'subheading', label: 'Section subheading' }].concat(extra || []);
@@ -327,11 +332,18 @@
     { id: 'dashboard', label: 'Dashboard', icon: 'house', render: renderDashboard },
     { id: 'site', label: 'Site & SEO', icon: 'settings', intro: 'Your site title, logo, favicon and search-engine details.', panels: [
       { title: 'Branding', path: 'site', fields: [
-        { key: 'logoText', label: 'Logo text', help: 'Shown as &lt;logo/&gt; when no logo image is set.' },
-        { key: 'footerText', label: 'Footer text' },
+        { key: 'logoText', label: 'Logo text', help: 'Also used as the terminal username.' },
+        { key: 'logoSuffix', label: 'Logo suffix', help: 'Coloured part after the name, e.g. <code class="k">.exe</code>' },
+        { key: 'footerText', label: 'Footer text', full: true },
+        { key: 'footerBigText', label: 'Giant footer text', help: 'The huge faded word at the bottom of the page.' },
         { key: 'logoImage', label: 'Logo image (optional)', type: 'image' },
         { key: 'favicon', label: 'Favicon (browser tab icon)', type: 'image' },
         { key: 'showAdminLink', label: 'Show “Admin” link in footer', type: 'toggle' }
+      ] },
+      { title: 'Boot screen & command menu', path: 'site', fields: [
+        { key: 'preloader', label: 'Show terminal boot screen (once per visit)', type: 'toggle' },
+        { key: 'commandPalette', label: 'Enable command menu (Ctrl/⌘ + K)', type: 'toggle' },
+        { key: 'preloaderLines', label: 'Boot screen lines', type: 'tags', placeholder: 'Add a line and press Enter' }
       ] },
       { title: 'SEO & sharing', path: 'site', fields: [
         { key: 'title', label: 'Page title', full: true },
@@ -362,14 +374,21 @@
       { title: 'Typography & shape', path: 'theme', fields: [
         { key: 'fontHeading', label: 'Heading font', type: 'select', options: FONTS, allowCustom: true, help: 'Any Google Font works.' },
         { key: 'fontBody', label: 'Body font', type: 'select', options: FONTS, allowCustom: true },
+        { key: 'fontMono', label: 'Code / mono font', type: 'select', options: MONO_FONTS, allowCustom: true },
         { key: 'radius', label: 'Corner roundness', type: 'range', min: 0, max: 32, unit: 'px', full: true }
       ] },
       { title: 'Mode & effects', path: 'theme', fields: [
         { key: 'mode', label: 'Default mode', type: 'select', options: [{ value: 'dark', label: 'Dark' }, { value: 'light', label: 'Light' }] },
         { key: 'allowVisitorToggle', label: 'Let visitors switch light/dark', type: 'toggle' },
-        { key: 'animations', label: 'Scroll & typing animations', type: 'toggle' },
+        { key: 'heroEffect', label: 'Hero background effect', type: 'select', options: [{ value: 'web', label: '🕸️ Spider-web network' }, { value: 'particles', label: '✨ Floating particles' }, { value: 'none', label: 'None' }] },
+        { key: 'animations', label: 'Scroll, typing & reveal animations', type: 'toggle' },
+        { key: 'customCursor', label: 'Custom cursor (desktop)', type: 'toggle' },
         { key: 'cursorGlow', label: 'Cursor glow effect', type: 'toggle' },
-        { key: 'backgroundGrid', label: 'Background grid', type: 'toggle' }
+        { key: 'tiltCards', label: '3D tilt on project cards', type: 'toggle' },
+        { key: 'magneticButtons', label: 'Magnetic buttons', type: 'toggle' },
+        { key: 'backgroundGrid', label: 'Background grid', type: 'toggle' },
+        { key: 'grain', label: 'Film grain texture', type: 'toggle' },
+        { key: 'scrollProgress', label: 'Scroll progress bar', type: 'toggle' }
       ] }
     ] },
     { id: 'sections', label: 'Sections & Menu', icon: 'layout-grid', render: renderSections },
@@ -384,8 +403,20 @@
         { key: 'availableText', label: 'Availability text' },
         { key: 'showSocials', label: 'Show social icons', type: 'toggle' }
       ] },
+      { title: 'Hero stats', path: 'hero', fields: [
+        { key: 'stats', type: 'list', itemLabel: 'Stat', titleKey: 'label', subKey: 'value', newItem: { value: '10+', label: 'New stat' }, fields: [
+          { key: 'value', label: 'Value', help: 'Numbers animate (e.g. 25+, 100%)' }, { key: 'label', label: 'Label' }] }
+      ] },
+      { title: 'Right side visual', path: 'hero', fields: [
+        { key: 'visual', label: 'Show on the right', type: 'select', options: [{ value: 'terminal', label: '💻 Interactive terminal' }, { value: 'photo', label: '🖼️ Profile photo' }, { value: 'none', label: 'Nothing' }] },
+        { key: 'terminalTitle', label: 'Terminal window title' },
+        { key: 'terminalIntro', type: 'list', label: 'Terminal intro (auto-typed on load)', itemLabel: 'Line', titleKey: 'command', subKey: 'output', newItem: { command: 'echo hi', output: 'hi' }, fields: [
+          { key: 'command', label: 'Command' }, { key: 'output', label: 'Output' }] },
+        { key: 'terminalCommands', type: 'list', label: 'Custom terminal commands (visitors can type these)', itemLabel: 'Command', titleKey: 'command', subKey: 'output', newItem: { command: 'secret', output: '🤫' }, fields: [
+          { key: 'command', label: 'Command' }, { key: 'output', label: 'Reply' }] }
+      ] },
       { title: 'Photos', path: 'hero', fields: [
-        { key: 'avatar', label: 'Profile photo', type: 'image' },
+        { key: 'avatar', label: 'Profile photo (when visual = photo)', type: 'image' },
         { key: 'backgroundImage', label: 'Background image (optional)', type: 'image' }
       ] },
       { title: 'Buttons', path: 'hero', fields: [
@@ -400,12 +431,38 @@
         { key: 'bio', label: 'Bio', type: 'textarea', rows: 7, help: 'Leave an empty line between paragraphs.' },
         { key: 'photo', label: 'Photo', type: 'image' },
         { key: 'location', label: 'Location' },
+        { key: 'timezone', label: 'Time zone (for the live clock)', type: 'select', allowCustom: true, options: ['Asia/Kolkata', 'Asia/Dubai', 'Europe/London', 'America/New_York', 'America/Los_Angeles', 'Asia/Singapore', 'Australia/Sydney'] },
+        { key: 'quote', label: 'Highlight quote', full: true },
         { key: 'resumeText', label: 'Resume button text' },
         { key: 'resumeLink', label: 'Resume / CV file', type: 'file', help: 'Upload a PDF or paste a link. Button is hidden when empty.' }
       ]) },
+      { title: 'Currently', path: 'about', fields: [
+        { key: 'currently', type: 'list', itemLabel: 'Row', titleKey: 'label', subKey: 'value', newItem: { label: 'Reading', value: '' }, fields: [
+          { key: 'label', label: 'Label' }, { key: 'value', label: 'Value' }] }
+      ] },
+      { title: 'Interests / what drives me', path: 'about', fields: [
+        { key: 'interests', type: 'list', itemLabel: 'Interest', titleKey: 'title', subKey: 'emoji', newItem: { emoji: '✨', title: 'New interest', text: '' }, fields: [
+          { key: 'emoji', label: 'Emoji' }, { key: 'title', label: 'Title' }, { key: 'text', label: 'Text', type: 'textarea', rows: 2 }] }
+      ] },
       { title: 'Stats', path: 'about', fields: [
         { key: 'stats', type: 'list', itemLabel: 'Stat', titleKey: 'label', subKey: 'value', newItem: { value: '10+', label: 'New stat' }, fields: [
           { key: 'value', label: 'Value' }, { key: 'label', label: 'Label' }] }
+      ] }
+    ] },
+    { id: 'services', label: 'Services', icon: 'zap', panels: [
+      { title: 'Text', path: 'services', fields: sectionText() },
+      { title: 'Services', path: 'services', fields: [
+        { key: 'items', type: 'list', itemLabel: 'Service', titleKey: 'title', iconKey: 'icon', iconType: 'ui', newItem: { icon: 'sparkles', title: 'New service', description: '' }, fields: [
+          { key: 'title', label: 'Title' },
+          { key: 'icon', label: 'Icon', type: 'select', options: iconOptions },
+          { key: 'description', label: 'Description', type: 'textarea', rows: 2 }] }
+      ] }
+    ] },
+    { id: 'marquee', label: 'Tech Marquee', icon: 'infinity', intro: 'The scrolling strip of tech logos under the hero.', panels: [
+      { title: 'Marquee', path: 'marquee', fields: [
+        { key: 'enabled', label: 'Show tech marquee', type: 'toggle', full: true },
+        { key: 'items', type: 'list', itemLabel: 'Tech', titleKey: 'name', iconKey: 'icon', newItem: { name: 'New tech', icon: '' }, fields: [
+          { key: 'name', label: 'Name' }, { key: 'icon', label: 'Logo', type: 'select', options: brandOptions }] }
       ] }
     ] },
     { id: 'skills', label: 'Skills', icon: 'code', panels: [
@@ -420,8 +477,9 @@
     { id: 'projects', label: 'Projects', icon: 'folder', panels: [
       { title: 'Text', path: 'projects', fields: sectionText() },
       { title: 'Projects', path: 'projects', fields: [
-        { key: 'items', type: 'list', itemLabel: 'Project', titleKey: 'title', thumbKey: 'image', newItem: { title: 'New project', description: '', image: '', tags: [], liveUrl: '', codeUrl: '', featured: false }, fields: [
+        { key: 'items', type: 'list', itemLabel: 'Project', titleKey: 'title', thumbKey: 'image', newItem: { title: 'New project', description: '', image: '', tags: [], year: '2026', liveUrl: '', codeUrl: '', featured: false }, fields: [
           { key: 'title', label: 'Title' },
+          { key: 'year', label: 'Year' },
           { key: 'featured', label: 'Featured (large card)', type: 'toggle' },
           { key: 'description', label: 'Description', type: 'textarea', rows: 3 },
           { key: 'image', label: 'Cover image', type: 'image' },
@@ -433,12 +491,13 @@
     { id: 'products', label: 'Products', icon: 'shopping-bag', panels: [
       { title: 'Text', path: 'products', fields: sectionText() },
       { title: 'Products & services', path: 'products', fields: [
-        { key: 'items', type: 'list', itemLabel: 'Product', titleKey: 'name', subKey: 'price', thumbKey: 'image', newItem: { name: 'New product', description: '', image: '', price: '₹0', badge: '', buttonText: 'Buy now', link: '' }, fields: [
+        { key: 'items', type: 'list', itemLabel: 'Product', titleKey: 'name', subKey: 'price', thumbKey: 'image', newItem: { name: 'New product', description: '', image: '', price: '₹0', badge: '', features: [], buttonText: 'Buy now', link: '' }, fields: [
           { key: 'name', label: 'Name' },
           { key: 'price', label: 'Price', help: 'Any text: ₹499, $9, Free, From ₹999…' },
           { key: 'description', label: 'Description', type: 'textarea', rows: 3 },
           { key: 'image', label: 'Image', type: 'image' },
           { key: 'badge', label: 'Badge (optional)', help: 'e.g. New, Bestseller, Sale' },
+          { key: 'features', label: 'Features (bullet list)', type: 'tags' },
           { key: 'buttonText', label: 'Button text' },
           { key: 'link', label: 'Buy / order link', type: 'url', full: true, help: 'Gumroad, Razorpay, Instamojo, WhatsApp link, or <code class="k">#contact</code>' }] }
       ] }
@@ -539,6 +598,7 @@
     var cards = [
       ['folder', (c.projects.items || []).length, 'Projects', 'projects'],
       ['shopping-bag', (c.products.items || []).length, 'Products', 'products'],
+      ['zap', ((c.services || {}).items || []).length, 'Services', 'services'],
       ['code', (c.skills.items || []).length, 'Skills', 'skills'],
       ['image', (c.gallery.items || []).length, 'Gallery photos', 'gallery'],
       ['inbox', messages.length, unread ? unread + ' unread' : 'Messages', 'messages'],

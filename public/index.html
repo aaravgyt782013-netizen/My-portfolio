@@ -6,6 +6,7 @@
   <title>{{TITLE}}</title>
   <meta name="description" content="{{DESCRIPTION}}" />
   <meta name="keywords" content="{{KEYWORDS}}" />
+  <meta name="theme-color" content="#050507" />
   <meta property="og:title" content="{{TITLE}}" />
   <meta property="og:description" content="{{DESCRIPTION}}" />
   <meta property="og:image" content="{{OG_IMAGE}}" />
@@ -14,52 +15,89 @@
   <link rel="icon" href="{{FAVICON}}" id="favicon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" id="font-link" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" />
+  <link rel="stylesheet" id="font-link" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="/css/style.css" />
   <script>/*{{CONTENT}}*/</script>
   <script>
-    // apply the visitor's saved light/dark choice before paint
-    try { var m = localStorage.getItem('pf-theme'); if (m && window.__CONTENT__ && window.__CONTENT__.theme.allowVisitorToggle) document.documentElement.dataset.theme = m; } catch (e) {}
+    (function () {
+      var c = window.__CONTENT__ || {}; var t = c.theme || {};
+      try { var m = localStorage.getItem('pf-theme'); if (m && t.allowVisitorToggle) document.documentElement.dataset.theme = m; } catch (e) {}
+      var booted = false; try { booted = sessionStorage.getItem('pf-booted'); } catch (e) {}
+      var inFrame = window.self !== window.top;
+      if (c.site && c.site.preloader && !booted && !inFrame) document.documentElement.classList.add('is-booting');
+    })();
   </script>
 </head>
 <body>
-  <div class="bg-fx" aria-hidden="true"><div class="bg-grid"></div><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <!-- boot screen -->
+  <div class="boot" id="boot" aria-hidden="true">
+    <div class="boot-inner">
+      <div class="boot-lines" id="boot-lines"></div>
+      <div class="boot-bar"><i id="boot-bar"></i></div>
+      <button class="boot-skip" id="boot-skip" type="button">skip →</button>
+    </div>
+  </div>
+
+  <div class="scroll-progress" id="scroll-progress"></div>
+  <div class="bg-fx" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
   <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"></div>
 
   <header class="nav" id="nav">
     <div class="container nav-inner">
-      <a href="#hero" class="logo" id="logo"></a>
+      <a href="#hero" class="logo" id="logo" aria-label="Home"></a>
       <nav class="nav-links" id="nav-links" aria-label="Main"></nav>
       <div class="nav-actions">
-        <button class="icon-btn" id="theme-toggle" aria-label="Toggle light/dark mode"></button>
-        <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false"></button>
+        <button class="kbd-btn" id="cmdk-btn" type="button" aria-label="Open command menu"></button>
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle light/dark mode"></button>
+        <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false"></button>
       </div>
     </div>
   </header>
 
   <main id="main"></main>
 
-  <footer class="footer">
-    <div class="container footer-inner">
-      <div>
-        <a href="#hero" class="logo" id="footer-logo"></a>
-        <p class="muted" id="footer-text"></p>
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#hero" class="logo" id="footer-logo"></a>
+          <p class="muted" id="footer-text"></p>
+        </div>
+        <div class="footer-cols" id="footer-cols"></div>
       </div>
-      <div class="socials" id="footer-socials"></div>
-    </div>
-    <div class="container footer-bottom">
-      <span id="copyright"></span>
-      <a href="/admin" class="admin-link" id="admin-link" hidden>Admin</a>
+      <div class="footer-big" id="footer-big" aria-hidden="true"></div>
+      <div class="footer-bottom">
+        <span id="copyright"></span>
+        <span class="footer-right"><span id="footer-time" class="mono"></span><a href="/admin" class="admin-link" id="admin-link" hidden>Admin</a></span>
+      </div>
     </div>
   </footer>
 
-  <button class="to-top" id="to-top" aria-label="Back to top"></button>
+  <button class="to-top" id="to-top" type="button" aria-label="Back to top"></button>
+
+  <!-- command palette -->
+  <div class="cmdk" id="cmdk" role="dialog" aria-modal="true" aria-label="Command menu" hidden>
+    <div class="cmdk-panel">
+      <div class="cmdk-search"><span id="cmdk-ic"></span><input id="cmdk-input" type="text" placeholder="Type a command or search…" autocomplete="off" spellcheck="false" /><kbd>esc</kbd></div>
+      <div class="cmdk-list" id="cmdk-list" role="listbox"></div>
+      <div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> select</span><span class="mono">aarav.exe</span></div>
+    </div>
+  </div>
 
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview" hidden>
-    <button class="icon-btn lb-close" id="lb-close" aria-label="Close"></button>
-    <img id="lb-img" alt="" />
-    <p id="lb-caption"></p>
+    <button class="icon-btn lb-close" id="lb-close" type="button" aria-label="Close"></button>
+    <button class="icon-btn lb-nav lb-prev" id="lb-prev" type="button" aria-label="Previous"></button>
+    <figure><img id="lb-img" alt="" /><figcaption id="lb-caption"></figcaption></figure>
+    <button class="icon-btn lb-nav lb-next" id="lb-next" type="button" aria-label="Next"></button>
   </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="/js/icons.js"></script>
   <script src="/js/main.js"></script>

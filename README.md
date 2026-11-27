@@ -1,31 +1,31 @@
-# My Portfolio ✨
+# aarav.exe — Portfolio ✨
 
-A modern developer portfolio with a built-in **admin panel (CMS)**. You can change everything on the site from the browser: text, links, colors, fonts, photos, projects, products, sections and more. You don't need to touch any code.
+> Silent moves. Loud dreams.
+
+A cinematic developer portfolio with a built-in **admin panel (CMS)**. You can change everything on the site from the browser: text, links, colors, fonts, photos, projects, products, sections and more. You don't need to touch any code.
 
 ![stack](https://img.shields.io/badge/Node.js-Express-8b5cf6) ![no-db](https://img.shields.io/badge/database-none%20(JSON%20file)-22d3ee)
 
 ## Features
 
-**Website**
-- Hero section with a typing animation, profile photo, availability badge and social icons
-- About section with bio, stats and a resume/CV download
-- Skills grouped by category, with animated level bars
-- Projects with cover images, tags, filters and live/code links
-- **Products and services** with price, badge and a buy/order button (works with Gumroad, Razorpay, Instamojo, WhatsApp and similar)
-- Journey timeline, an Instagram-style gallery with a lightbox, and testimonials
-- Contact section: email, phone, WhatsApp, location, plus a working contact form (with spam protection)
-- Dark/light mode, responsive layout, SEO and social-share tags
+**Website** (dark, cinematic `.exe` aesthetic)
+- 🖥️ **Terminal boot screen** on first visit (lines are editable, can be skipped or turned off)
+- 🕸️ Hero with an **interactive spider-web canvas** that reacts to the cursor, a glitching name, typing roles and animated stats
+- 💻 **Interactive terminal**: visitors can type `help`, `whoami`, `projects`, `socials`, `open github`, plus your own custom commands
+- ⌘ **Command menu** (`Ctrl/⌘ + K` or `/`) to jump to sections, copy your email, switch theme or open socials
+- ♾️ Infinite **tech-logo marquee**
+- 🍱 **Bento-grid About** with a live local clock, "currently" list, interests, quote and count-up stats
+- Services, skills, **case-study project cards** (3D tilt, spotlight hover, filters), **store** with prices and features, an animated journey timeline, a **bento gallery** with lightbox, testimonials and a **contact** section with copy-email and a working form
+- ✨ Custom cursor, magnetic buttons, film grain, scroll-progress bar, scroll reveals, dark/light mode, fully responsive, SEO and social-share tags
 
 **Admin panel** (`/admin`)
 - Login page. Email and password come from **environment variables**
-- Edit every section. Add, remove, reorder and duplicate items
-- **Colors and theme:** pick any color, use 6 one-click presets, choose Google Fonts, set corner roundness and turn effects on/off
-- **Sections and menu:** show/hide, rename and reorder sections
+- Edit **every** section, the terminal commands, the boot screen, the marquee and the services. Add, remove, reorder and duplicate items
+- **Colors & theme:** pick any color, use 8 presets (Rose Noir, Spider-Verse, …), choose Google Fonts (heading/body/mono), set corner roundness, pick the hero effect and switch each effect on/off
+- **Sections & menu:** show/hide, rename and reorder sections
 - **Photos:** upload (drag and drop), media library, bulk-add gallery photos
 - **Live preview** that updates as you type (desktop and mobile views)
-- Inbox for contact-form messages (mark read, reply, delete)
-- Backup export/import and reset to defaults
-- `Ctrl/Cmd + S` saves
+- Inbox for contact-form messages, backup export/import, reset to defaults, `Ctrl/Cmd + S` to save
 
 ## Quick start
 
