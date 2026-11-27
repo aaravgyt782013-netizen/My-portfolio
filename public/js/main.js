@@ -634,7 +634,8 @@
     $('#nav-links').innerHTML = list.filter(function (p) { return p.inNav !== false; }).map(function (p) { return '<a ' + pageLink(p.id) + ' data-id="' + p.id + '">' + esc(p.label) + '<span class="nl-line">' + D.scribble + '</span></a>'; }).join('');
     $('#mobile-menu').innerHTML = '<div class="mm-inner">' + list.map(function (p, i) { return '<a ' + pageLink(p.id) + ' data-id="' + p.id + '" style="--d:' + i * 35 + 'ms"><span class="mono">' + pad(i) + '</span>' + esc(p.label) + '<em>' + esc(p.emoji || '') + '</em></a>'; }).join('') +
       '<div class="mm-actions">' +
-        ((C.teacher || {}).enabled !== false ? '<button type="button" class="btn btn-ghost btn-sm" data-mm="teacher">' + I.ui('glasses') + esc(L('general', 'teacherButton')) + '</button>' : '') +
+        (specsAction() === 'photos' ? '<a class="btn btn-ghost btn-sm mm-photos" href="' + esc(pathFor('photos')) + '" target="_blank" rel="noopener">' + I.ui('glasses') + esc(L('general', 'specsButton')) + '</a>' : '') +
+        ((C.teacher || {}).enabled !== false ? '<button type="button" class="btn btn-ghost btn-sm" data-mm="teacher">' + I.ui('graduation-cap') + esc(L('general', 'teacherButton')) + '</button>' : '') +
         ((C.theme || {}).allowVisitorToggle !== false ? '<button type="button" class="btn btn-ghost btn-sm" data-mm="theme">' + I.ui('moon') + esc(L('general', 'themeButton')) + '</button>' : '') +
       '</div>' +
       '<div class="mm-socials socials">' + socialLinks(C.socials) + '</div></div>';
@@ -647,6 +648,7 @@
     tb.href = sa === 'photos' ? pathFor('photos') : '#';
     if (sa === 'photos') { tb.target = '_blank'; tb.rel = 'noopener'; } else { tb.removeAttribute('target'); tb.setAttribute('role', 'button'); }
     if (sa === 'photos') tb.removeAttribute('role');
+    tb.classList.toggle('specs-photos', sa === 'photos');
     $('#theme-toggle').title = L('general', 'themeButton'); $('#theme-toggle').setAttribute('aria-label', L('general', 'themeButton'));
     $('#to-top').innerHTML = '<svg class="ring" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" stroke-dasharray="150.8" stroke-dashoffset="150.8" id="top-ring"/></svg>' + I.ui('arrow-up');
     $('#to-top').setAttribute('aria-label', L('general', 'backToTop'));
@@ -1095,7 +1097,7 @@
   /** What the 👓 specs button in the top bar does: 'photos' (open the memory box), 'teacher' or '' (hidden). */
   function specsAction() {
     var a = (C.site || {}).specsAction || 'photos';
-    if (a === 'photos') { var pg = pageById('photos'); return pg && pg.enabled && C.photos ? 'photos' : (C.teacher && C.teacher.enabled ? 'teacher' : ''); }
+    if (a === 'photos') { var pg = pageById('photos'); return pg && pg.enabled !== false ? 'photos' : ''; } // never falls back to teacher mode
     if (a === 'teacher') return C.teacher && C.teacher.enabled ? 'teacher' : '';
     return '';
   }
@@ -1181,7 +1183,7 @@
       list.push({ group: A, label: L('cmdk', 'sendEmail'), icon: 'mail', run: function () { location.href = 'mailto:' + c.email; } });
     }
     if (C.theme.allowVisitorToggle) list.push({ group: A, label: L('cmdk', 'toggleTheme'), icon: 'moon-star', run: toggleTheme });
-    if (C.teacher && C.teacher.enabled) list.push({ group: A, label: L('cmdk', 'teacherMode'), icon: 'glasses', hint: (C.teacher.hotkey || 't').toUpperCase(), run: toggleTeacher });
+    if (C.teacher && C.teacher.enabled) list.push({ group: A, label: L('cmdk', 'teacherMode'), icon: 'graduation-cap', hint: (C.teacher.hotkey || 't').toUpperCase(), run: toggleTeacher });
     if (C.about && C.about.resumeLink) list.push({ group: A, label: L('cmdk', 'downloadCv'), icon: 'download', run: function () { window.open(C.about.resumeLink, '_blank', 'noopener'); } });
     if (C.home && C.home.terminalEnabled) list.push({ group: A, label: L('cmdk', 'openTerminal'), icon: 'terminal', run: function () {
       var goT = function () { var t = $('#terminal'); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(function () { var i = $('#term-input'); if (i && !$('#term-input-row').hidden) i.focus({ preventScroll: true }); }, 700); } };
@@ -1278,6 +1280,7 @@
     $('#menu-btn').innerHTML = I.ui('menu');
     $('#menu-btn').addEventListener('click', function () { setMenu($('#mobile-menu').hidden); });
     $('#mobile-menu').addEventListener('click', function (e) {
+      if (e.target.closest('.mm-photos')) { setMenu(false); return; } // opens /photos in a new tab
       var b = e.target.closest('[data-mm]'); if (!b) return;
       setMenu(false);
       if (b.dataset.mm === 'teacher') setTimeout(toggleTeacher, 120); else toggleTheme();

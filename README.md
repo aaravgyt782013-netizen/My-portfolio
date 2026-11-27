@@ -113,5 +113,10 @@ If a `content.json` saved by the old version exists, it is backed up automatical
 
 Build command: `npm install --omit=dev`. Start command: `npm start`. Port: `PORT` (default 3000).
 
+### Neon (or any Postgres you bring yourself)
+1. Copy the connection string from Neon (**Connect** → it looks like `postgresql://neondb_owner:…@ep-…neon.tech/neondb?sslmode=require&channel_binding=require`).
+2. Paste it as the `DATABASE_URL` environment variable on your host, then redeploy or restart.
+3. You don't have to run anything in Neon's SQL Editor, because the tables are created automatically on first start. If you want to, [`scripts/database.sql`](scripts/database.sql) has the same `CREATE TABLE` statements plus some handy check queries.
+
 ### Render / Railway / others
 Add a Postgres database and set `DATABASE_URL` (Render: create a PostgreSQL instance and copy its *Internal Database URL*). Without a database you need a persistent disk with `DATA_DIR` and `UPLOAD_DIR` pointing at it. Otherwise saves and uploads are wiped on every restart or redeploy.
