@@ -6,6 +6,8 @@
  *
  * Admin credentials come from environment variables (see .env.example):
  *   ADMIN_EMAIL, ADMIN_PASSWORD, SESSION_SECRET
+ * Storage: Postgres when DATABASE_URL is set (content, messages AND uploaded photos live in the
+ * database, so they survive redeploys), otherwise local files in DATA_DIR / UPLOAD_DIR.
  */
 require('dotenv').config();
 
@@ -15,12 +17,13 @@ const multer = require('multer');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { createStore, mimeOf } = require('./lib/store');
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'admin@example.com').trim().toLowerCase();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123';
-const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+let SESSION_SECRET = process.env.SESSION_SECRET || ''; // if empty, one is generated and kept in storage (see start())
 const SESSION_HOURS = Number(process.env.SESSION_HOURS) || 12;
 const MAX_UPLOAD_MB = Number(process.env.MAX_UPLOAD_MB) || 8;
 
@@ -29,30 +32,19 @@ const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : pat
 const UPLOAD_DIR = process.env.UPLOAD_DIR ? path.resolve(process.env.UPLOAD_DIR) : path.join(ROOT, 'uploads');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const DEFAULT_CONTENT = path.join(ROOT, 'data', 'default-content.json');
-const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
-const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
+const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL || '';
+
+// Postgres when DATABASE_URL is set (Antideploy, Render, Railway…), local files otherwise.
+const store = createStore({ dataDir: DATA_DIR, uploadDir: UPLOAD_DIR, databaseUrl: DATABASE_URL });
 
 if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
   console.warn('\n⚠️  ADMIN_EMAIL / ADMIN_PASSWORD not set — using insecure defaults (admin@example.com / changeme123).');
   console.warn('   Copy .env.example to .env and set your own credentials.\n');
 }
-if (!process.env.SESSION_SECRET) {
-  console.warn('⚠️  SESSION_SECRET not set — a random one is used, so admins are logged out on every restart.\n');
-}
-
-fs.mkdirSync(DATA_DIR, { recursive: true });
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 /* ----------------------------- storage helpers ----------------------------- */
-function readJSON(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return fallback; }
-}
-function writeJSON(file, data) {
-  const tmp = file + '.' + process.pid + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
-  fs.renameSync(tmp, file); // atomic replace
-}
-function defaults() { return readJSON(DEFAULT_CONTENT, {}); }
+const DEFAULTS_JSON = fs.readFileSync(DEFAULT_CONTENT, 'utf8'); // ships with the code, never changes at runtime
+function defaults() { return JSON.parse(DEFAULTS_JSON); }
 function isObj(v) { return v && typeof v === 'object' && !Array.isArray(v); }
 /** Fill keys missing from saved content with defaults (so new fields appear after upgrades). */
 function mergeDefaults(def, cur) {
@@ -63,14 +55,16 @@ function mergeDefaults(def, cur) {
 }
 function getContent() {
   const def = defaults();
-  let cur = readJSON(CONTENT_FILE, null);
-  if (!cur) return def;
+  let cur = store.get('content');
+  if (!isObj(cur)) return def;
   // one-time migration: content saved by an older version (single-page layout) is backed up
   // and replaced by the new multi-page defaults — only the social links are carried over.
   if (!(Number(cur.version) >= Number(def.version || 0))) {
-    try { fs.writeFileSync(CONTENT_FILE.replace(/\.json$/, '') + '.v' + (cur.version || 2) + '-backup.json', JSON.stringify(cur, null, 2)); } catch (e) { /* ignore */ }
-    cur = { ...def, socials: Array.isArray(cur.socials) && cur.socials.length ? cur.socials : def.socials };
-    try { writeJSON(CONTENT_FILE, cur); } catch (e) { /* ignore */ }
+    const old = cur;
+    cur = { ...def, socials: Array.isArray(old.socials) && old.socials.length ? old.socials : def.socials };
+    const fail = (e) => console.error('Migration save failed:', e.message);
+    Promise.resolve(store.set('content-v' + (old.version || 2) + '-backup', old)).catch(fail);
+    Promise.resolve(store.set('content', cur)).catch(fail);
     console.log('ℹ️  Migrated saved content to version ' + def.version + ' (old copy kept as a backup file).');
   }
   const merged = mergeDefaults(def, cur);
@@ -89,7 +83,7 @@ function getContent() {
   }
   return merged;
 }
-function getMessages() { return readJSON(MESSAGES_FILE, []); }
+function getMessages() { const m = store.get('messages'); return Array.isArray(m) ? m : []; }
 
 /* --------------------------------- auth ---------------------------------- */
 const sha = (s) => crypto.createHash('sha256').update(String(s)).digest();
@@ -151,7 +145,7 @@ app.get('/api/content', (req, res) => {
   res.json(getContent());
 });
 
-app.post('/api/contact', (req, res) => {
+app.post('/api/contact', async (req, res) => {
   const content = getContent();
   if (!content.contact?.formEnabled) return res.status(403).json({ error: 'Contact form is disabled.' });
   if (!rateLimit('contact:' + req.ip, 5, 10 * 60_000)) return res.status(429).json({ error: 'Too many messages. Please try again later.' });
@@ -172,7 +166,7 @@ app.post('/api/contact', (req, res) => {
   }
   const all = getMessages();
   all.unshift(msg);
-  writeJSON(MESSAGES_FILE, all.slice(0, 2000));
+  await store.set('messages', all.slice(0, 2000));
   res.json({ ok: true, message: content.contact.successMessage });
 });
 
@@ -194,23 +188,23 @@ app.post('/api/auth/login', (req, res) => {
   const token = signToken({ email: ADMIN_EMAIL, exp: Date.now() + SESSION_HOURS * 3600_000 });
   res.json({ token, email: ADMIN_EMAIL, expiresInHours: SESSION_HOURS });
 });
-app.get('/api/auth/me', requireAuth, (req, res) => res.json({ email: req.user.email, exp: req.user.exp }));
+app.get('/api/auth/me', requireAuth, (req, res) => res.json({ email: req.user.email, exp: req.user.exp, storage: store.kind }));
 
 // ---- admin API
 const admin = express.Router();
 admin.use(requireAuth);
 
-admin.put('/content', (req, res) => {
+admin.put('/content', async (req, res) => {
   const body = req.body;
   if (!isObj(body) || !isObj(body.site) || !isObj(body.theme) || !Array.isArray(body.pages)) {
     return res.status(400).json({ error: 'Invalid content structure.' });
   }
-  writeJSON(CONTENT_FILE, body);
-  res.json({ ok: true, savedAt: new Date().toISOString() });
+  await store.set('content', body);
+  res.json({ ok: true, savedAt: new Date().toISOString(), storage: store.kind });
 });
 
-admin.post('/reset', (req, res) => {
-  try { fs.unlinkSync(CONTENT_FILE); } catch {}
+admin.post('/reset', async (req, res) => {
+  await store.del('content');
   res.json({ ok: true, content: getContent() });
 });
 
@@ -218,58 +212,69 @@ admin.get('/defaults', (req, res) => res.json(defaults()));
 
 // uploads
 const ALLOWED = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif', 'image/svg+xml': '.svg', 'image/x-icon': '.ico', 'image/vnd.microsoft.icon': '.ico', 'application/pdf': '.pdf' };
+const uploadName = (file) => {
+  const base = path.parse(file.originalname).name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'file';
+  return `${base}-${Date.now().toString(36)}${crypto.randomBytes(3).toString('hex')}${ALLOWED[file.mimetype]}`;
+};
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: UPLOAD_DIR,
-    filename: (req, file, cb) => {
-      const base = path.parse(file.originalname).name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'file';
-      cb(null, `${base}-${Date.now().toString(36)}${crypto.randomBytes(3).toString('hex')}${ALLOWED[file.mimetype]}`);
-    },
-  }),
+  storage: multer.memoryStorage(), // files go to the store (database or disk), never straight to the container disk
   limits: { fileSize: MAX_UPLOAD_MB * 1024 * 1024, files: 20 },
   fileFilter: (req, file, cb) => (ALLOWED[file.mimetype] ? cb(null, true) : cb(new Error('Only images (jpg, png, webp, gif, svg, ico) and PDF files are allowed.'))),
 });
 admin.post('/upload', (req, res) => {
-  upload.array('files', 20)(req, res, (err) => {
+  upload.array('files', 20)(req, res, async (err) => {
     if (err) return res.status(400).json({ error: err.message });
-    res.json({ files: (req.files || []).map((f) => ({ name: f.filename, url: '/uploads/' + f.filename, size: f.size })) });
+    try {
+      const out = [];
+      for (const f of req.files || []) {
+        const name = uploadName(f);
+        await store.putFile(name, f.mimetype, f.buffer);
+        out.push({ name, url: '/uploads/' + name, size: f.size });
+      }
+      res.json({ files: out });
+    } catch (e) {
+      console.error('Upload failed:', e.message);
+      res.status(500).json({ error: 'Could not save the file: ' + e.message });
+    }
   });
 });
-admin.get('/uploads', (req, res) => {
-  const files = fs.readdirSync(UPLOAD_DIR)
-    .filter((f) => !f.startsWith('.'))
-    .map((f) => { const st = fs.statSync(path.join(UPLOAD_DIR, f)); return { name: f, url: '/uploads/' + f, size: st.size, mtime: st.mtimeMs }; })
+admin.get('/uploads', async (req, res) => {
+  const files = (await store.listFiles())
+    .map((f) => ({ ...f, url: '/uploads/' + f.name }))
     .sort((a, b) => b.mtime - a.mtime);
   const assets = fs.existsSync(path.join(PUBLIC_DIR, 'assets'))
     ? fs.readdirSync(path.join(PUBLIC_DIR, 'assets')).filter((f) => !f.startsWith('.')).map((f) => ({ name: f, url: '/assets/' + f, builtin: true }))
     : [];
   res.json({ files, assets });
 });
-admin.delete('/uploads/:name', (req, res) => {
+admin.delete('/uploads/:name', async (req, res) => {
   const name = path.basename(req.params.name);
-  const p = path.join(UPLOAD_DIR, name);
-  if (!fs.existsSync(p)) return res.status(404).json({ error: 'Not found' });
-  fs.unlinkSync(p);
+  if (!(await store.deleteFile(name))) return res.status(404).json({ error: 'Not found' });
   res.json({ ok: true });
 });
 
 // messages
 admin.get('/messages', (req, res) => res.json(getMessages()));
-admin.patch('/messages/:id', (req, res) => {
+admin.patch('/messages/:id', async (req, res) => {
   const all = getMessages();
   const m = all.find((x) => x.id === req.params.id);
   if (!m) return res.status(404).json({ error: 'Not found' });
   if (typeof req.body?.read === 'boolean') m.read = req.body.read;
-  writeJSON(MESSAGES_FILE, all);
+  await store.set('messages', all);
   res.json(m);
 });
-admin.delete('/messages/:id', (req, res) => {
-  writeJSON(MESSAGES_FILE, getMessages().filter((x) => x.id !== req.params.id));
+admin.delete('/messages/:id', async (req, res) => {
+  await store.set('messages', getMessages().filter((x) => x.id !== req.params.id));
   res.json({ ok: true });
 });
 
 app.use('/api/admin', admin);
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
+// storage/database errors → a clear JSON message instead of a crash or an HTML error page
+app.use('/api', (err, req, res, next) => {
+  console.error('API error:', err.message || err.code || String(err));
+  res.status(err.status && err.status < 500 ? err.status : 500).json({ error: err.status && err.status < 500 ? err.message : 'Could not save — the server storage/database had a problem. Please try again.' });
+});
 
 /* ------------------------------ pages / static ----------------------------- */
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -320,7 +325,19 @@ app.get('/admin/login', (req, res) => res.set('Cache-Control', 'no-store').type(
 
 // versioned files (?v=...) are cached for a year; everything else for an hour
 const cacheHeaders = (res) => { if (res.req.query.v) res.set('Cache-Control', 'public, max-age=31536000, immutable'); };
-app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '30d', setHeaders: (res, p) => { if (p.endsWith('.svg')) res.set('Content-Security-Policy', "script-src 'none'"); } }));
+// uploaded files are served from the store (database or disk). Names are unique, so browsers may cache them for a long time.
+app.get('/uploads/:name', async (req, res, next) => {
+  try {
+    const name = path.basename(req.params.name);
+    const f = await store.getFile(name);
+    if (!f) return res.status(404).type('text/plain').send('Not found');
+    const etag = '"' + f.size.toString(36) + '-' + Math.floor(f.mtime || 0).toString(36) + '"';
+    res.set({ 'Content-Type': f.mime || mimeOf(name), 'Cache-Control': 'public, max-age=2592000, immutable', ETag: etag });
+    if (name.toLowerCase().endsWith('.svg')) res.set('Content-Security-Policy', "script-src 'none'");
+    if (req.get('if-none-match') === etag) return res.status(304).end();
+    res.send(f.data);
+  } catch (e) { next(e); }
+});
 app.use('/assets', express.static(path.join(PUBLIC_DIR, 'assets'), { maxAge: '30d' }));
 app.use(express.static(PUBLIC_DIR, { index: false, maxAge: '1h', setHeaders: cacheHeaders }));
 
@@ -341,7 +358,21 @@ app.get(/.*/, (req, res) => {
   res.status(page ? 200 : 404).set('Cache-Control', 'no-cache').type('html').send(renderShell(c, page, originOf(req)));
 });
 
-app.listen(PORT, HOST, () => {
-  console.log(`✅ Portfolio running at http://localhost:${PORT}`);
-  console.log(`🔐 Admin panel at   http://localhost:${PORT}/admin  (login: ${ADMIN_EMAIL})`);
-});
+async function start() {
+  // when moving to a database, anything saved locally before is imported once
+  await store.init({ importFrom: { dataDir: DATA_DIR, uploadDir: UPLOAD_DIR } });
+  if (!SESSION_SECRET) {
+    // no SESSION_SECRET env var: generate one and keep it in storage, so admins stay logged in across restarts/sleep
+    SESSION_SECRET = store.get('session-secret');
+    if (typeof SESSION_SECRET !== 'string' || SESSION_SECRET.length < 32) {
+      SESSION_SECRET = crypto.randomBytes(32).toString('hex');
+      try { await store.set('session-secret', SESSION_SECRET); } catch (e) { console.warn('Could not store the session secret:', e.message); }
+    }
+  }
+  app.listen(PORT, HOST, () => {
+    console.log(`✅ Portfolio running at http://localhost:${PORT}`);
+    console.log(`💾 Saving admin changes & uploads to: ${store.label}`);
+    console.log(`🔐 Admin panel at   http://localhost:${PORT}/admin  (login: ${ADMIN_EMAIL})`);
+  });
+}
+start().catch((e) => { console.error('❌ Failed to start:', e.message); process.exit(1); });

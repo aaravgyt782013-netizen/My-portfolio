@@ -77,7 +77,9 @@ npm start
 | `SESSION_HOURS` | How long a login lasts (default `12`) |
 | `PORT` / `HOST` | Server port/host (default `3000` / `0.0.0.0`) |
 | `MAX_UPLOAD_MB` | Maximum upload size (default `8`) |
-| `DATA_DIR` / `UPLOAD_DIR` | Where content and uploads are stored. Point these at a persistent disk when you deploy |
+| `DATABASE_URL` | Postgres connection string. **When set, all admin saves, contact messages and uploaded photos are stored in the database.** Antideploy, Render, Railway and Neon set it for you. The tables (`pf_kv`, `pf_files`) are created automatically |
+| `DATABASE_SSL` | Set to `true` to force SSL if your provider needs it and the URL has no `sslmode` |
+| `DATA_DIR` / `UPLOAD_DIR` | Where content and uploads are stored **when there is no `DATABASE_URL`** (local development or a persistent disk) |
 
 > ⚠️ If `ADMIN_EMAIL` / `ADMIN_PASSWORD` are not set, the server falls back to `admin@example.com` / `changeme123` and prints a warning. Always set your own.
 
@@ -102,6 +104,14 @@ If a `content.json` saved by the old version exists, it is backed up automatical
 
 ## Deploying
 
-This app needs a Node.js host with a persistent disk, for example **Render**, **Railway**, **Fly.io** or a VPS. Set the environment variables in the host's dashboard. Point `DATA_DIR` and `UPLOAD_DIR` at the persistent disk so your edits and uploads survive redeploys.
+**Storage:** if `DATABASE_URL` is set, everything the admin saves (content, photos, memory notes, uploads, contact messages, and even an auto-generated session secret) lives in **Postgres**. It's live for every visitor and survives redeploys, restarts and sleeping containers. The first time the app starts on an empty database, it imports any local `data/content.json`, `data/messages.json` and `uploads/` files once. The admin dashboard shows where saves are going.
 
-> **Important for /photos and every admin save:** everything you save in the admin is stored on the server (`content.json` plus the `uploads/` folder), so every visitor sees it. On Render, add a **Disk** mounted at `/var/data` and set `DATA_DIR=/var/data/data` and `UPLOAD_DIR=/var/data/uploads`. Without a disk, Render wipes your saved changes and uploaded photos whenever the service restarts or redeploys.
+### Antideploy (recommended, works out of the box)
+1. Deploy the repo. Antideploy sees the `pg` package and gives the app a Postgres database with `DATABASE_URL` already set. There is no disk to configure.
+2. In the app's **Environment variables**, set `ADMIN_EMAIL`, `ADMIN_PASSWORD` and (recommended) `SESSION_SECRET`.
+3. Open `/admin`. The dashboard should say **"Saved to your database"**.
+
+Build command: `npm install --omit=dev`. Start command: `npm start`. Port: `PORT` (default 3000).
+
+### Render / Railway / others
+Add a Postgres database and set `DATABASE_URL` (Render: create a PostgreSQL instance and copy its *Internal Database URL*). Without a database you need a persistent disk with `DATA_DIR` and `UPLOAD_DIR` pointing at it. Otherwise saves and uploads are wiped on every restart or redeploy.

@@ -10,6 +10,7 @@
   var messages = [];
   var previewTimer = null;
   var previewPage = 'home';  // page shown in the live preview
+  var storageKind = '';      // 'postgres' or 'files' — where the server keeps saves & uploads
 
   /* ======================= helpers ======================= */
   function $(s, r) { return (r || document).querySelector(s); }
@@ -806,7 +807,10 @@
       h('button', { class: 'a-btn', html: I.ui('type') + 'Edit small texts', onclick: function () { go('labels'); } }),
       h('button', { class: 'a-btn', html: I.ui('eye') + 'Live preview', onclick: togglePreview })
     ])]));
-    el.appendChild(h('div', { class: 'panel', html: '<h3>' + I.ui('lock') + 'Login credentials</h3><p class="hint" style="margin:0">Your admin email and password come from the <code class="k">ADMIN_EMAIL</code> and <code class="k">ADMIN_PASSWORD</code> environment variables (on Render: Environment tab, locally: the <code class="k">.env</code> file). Change them there and restart.</p>' }));
+    if (storageKind) el.appendChild(h('div', { class: 'panel', html: storageKind === 'postgres'
+      ? '<h3>' + I.ui('circle-check') + 'Saved to your database</h3><p class="hint" style="margin:0">Every save, contact message and uploaded photo is stored in your Postgres database (<code class="k">DATABASE_URL</code>), so it is live for every visitor and survives redeploys, restarts and sleep.</p>'
+      : '<h3>' + I.ui('triangle-alert') + 'Saved to files on the server</h3><p class="hint" style="margin:0">No <code class="k">DATABASE_URL</code> is set, so saves and uploads are kept as files. That is fine on your own computer, but hosts like Antideploy wipe the disk on every deploy. Add a Postgres database (most hosts set <code class="k">DATABASE_URL</code> for you) and redeploy.</p>' }));
+    el.appendChild(h('div', { class: 'panel', html: '<h3>' + I.ui('lock') + 'Login credentials</h3><p class="hint" style="margin:0">Your admin email and password come from the <code class="k">ADMIN_EMAIL</code> and <code class="k">ADMIN_PASSWORD</code> environment variables (on Antideploy or Render: the app’s environment variables, locally: the <code class="k">.env</code> file). Change them there and restart.</p>' }));
   }
 
   function renderPresets(panel) {
@@ -1094,6 +1098,7 @@
   Promise.all([api('/api/auth/me'), fetch('/api/content', { cache: 'no-store' }).then(function (r) { return r.json(); })])
     .then(function (res) {
       $('#who').innerHTML = 'Signed in as <b>' + esc(res[0].email) + '</b>';
+      storageKind = res[0].storage || '';
       state = res[1];
       savedJSON = JSON.stringify(state);
       var initial = location.hash.slice(1);
