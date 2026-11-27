@@ -27,7 +27,10 @@ const ui = ['mail', 'phone', 'map-pin', 'external-link', 'code', 'sun', 'moon', 
   'music', 'headphones', 'flame', 'heart', 'command', 'mouse-pointer-2', 'clock', 'calendar-days', 'activity', 'target', 'award',
   'brain', 'coffee', 'wand-sparkles', 'layers-3', 'server', 'cloud', 'git-branch', 'infinity', 'crosshair', 'keyboard', 'swords',
   'volleyball', 'goal', 'medal', 'moon-star', 'orbit', 'radio', 'wifi', 'bug', 'blocks', 'app-window', 'square-terminal',
-  'arrow-up-right', 'mail-check', 'gem', 'crown', 'lightbulb', 'book-open', 'graduation-cap', 'user-round', 'map', 'corner-down-left'];
+  'arrow-up-right', 'mail-check', 'gem', 'crown', 'lightbulb', 'book-open', 'graduation-cap', 'user-round', 'map', 'corner-down-left',
+  'glasses', 'eye-off', 'pencil', 'eraser', 'sticky-note', 'notebook-pen', 'school', 'id-card', 'shuffle', 'wind', 'dice-5',
+  'plane', 'book-marked', 'clipboard-list', 'calendar', 'scroll-text', 'hand', 'file-text', 'badge-check', 'brush', 'paintbrush',
+  'undo-2', 'rotate-ccw', 'party-popper', 'chevron-left', 'chevron-right', 'maximize-2', 'arrow-left', 'notebook', 'pin', 'utensils', 'ticket', 'pencil-ruler', 'sticker', 'backpack', 'bell', 'scissors', 'paperclip'];
 
 const out = { brand: {}, ui: {} };
 for (const [key, file] of Object.entries(brands)) {

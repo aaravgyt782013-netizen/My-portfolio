@@ -1,199 +1,637 @@
 {
+  "version": 3,
   "site": {
-    "title": "Aarav — Developer & Creator | aarav.exe",
-    "description": "Aarav (aarav.exe) — a developer from India building fast, beautiful websites, apps, bots and games. Silent moves. Loud dreams.",
-    "keywords": "Aarav, aarav.exe, developer, web developer, portfolio, India, Delhi, discord bot, game developer",
+    "title": "Aarav — Developer from the Last Bench | aarav.exe",
+    "description": "Aarav (aarav.exe) — a self-taught developer from Delhi building fast, beautiful websites, apps, Discord bots and games from the last bench. Silent moves. Loud dreams.",
+    "keywords": "Aarav, aarav.exe, developer, web developer, portfolio, India, Delhi, discord bot, game developer, backbencher",
     "logoText": "aarav",
     "logoSuffix": ".exe",
     "logoImage": "",
     "favicon": "/favicon.svg",
     "ogImage": "/assets/profile.jpg",
-    "footerText": "Somewhere between dreams & reality. Crafted with code, coffee and silent moves.",
+    "footerText": "Made on the last bench with code, chai and zero attention in class.",
     "footerBigText": "AARAV.EXE",
+    "footerNote": "no homework was harmed in the making of this website ✏️",
+    "copyright": "© {year} {name} — all rights reserved.",
     "showAdminLink": false,
     "preloader": true,
     "preloaderLines": [
-      "booting aarav.exe ...",
-      "loading dreams ......... [ok]",
-      "syncing reality ........ [ok]",
-      "compiling ideas ........ [ok]",
-      "access granted. welcome."
+      "teacher: roll no. 07?",
+      "aarav: present sir 🙋",
+      "sneaking to the last bench ........ ok",
+      "opening laptop under the desk ..... ok",
+      "class.exe loaded — welcome!"
     ],
-    "commandPalette": true
+    "commandPalette": true,
+    "customCss": "",
+    "customHead": ""
   },
   "theme": {
     "mode": "dark",
     "allowVisitorToggle": true,
-    "primary": "#ff2d55",
-    "secondary": "#8b5cf6",
-    "accent": "#ff7a45",
-    "background": "#050507",
-    "surface": "#0e0e13",
-    "text": "#f4f4f6",
-    "muted": "#8d8d9b",
-    "lightBackground": "#f6f5f8",
-    "lightSurface": "#ffffff",
-    "lightText": "#121218",
-    "lightMuted": "#5f5f6e",
-    "fontHeading": "Space Grotesk",
-    "fontBody": "Inter",
+    "primary": "#ffd60a",
+    "secondary": "#ff5a5f",
+    "accent": "#5ec8ff",
+    "background": "#121513",
+    "surface": "#1b1f1c",
+    "text": "#f2efe6",
+    "muted": "#9ca39d",
+    "lightBackground": "#f6f1e4",
+    "lightSurface": "#fffdf6",
+    "lightText": "#1c1c1e",
+    "lightMuted": "#5f5b52",
+    "paper": "#fbf8ef",
+    "paperText": "#1f2430",
+    "sticky1": "#ffe873",
+    "sticky2": "#ffb3c7",
+    "sticky3": "#a8dcff",
+    "sticky4": "#b8f0a0",
+    "fontHeading": "Permanent Marker",
+    "fontBody": "Space Grotesk",
+    "fontHand": "Caveat",
     "fontMono": "JetBrains Mono",
-    "radius": 20,
+    "baseFontSize": 16,
+    "radius": 14,
+    "containerWidth": 1180,
+    "bgPattern": "grid",
+    "lightBgPattern": "ruled",
     "animations": true,
-    "heroEffect": "web",
+    "pageTransitions": true,
     "customCursor": true,
-    "cursorGlow": true,
-    "backgroundGrid": true,
-    "grain": true,
-    "scrollProgress": true,
+    "chalkTrail": true,
+    "doodles": true,
+    "stickyTilt": true,
     "tiltCards": true,
-    "magneticButtons": true
+    "magneticButtons": true,
+    "grain": true,
+    "scrollProgress": true
   },
-  "sections": [
-    { "id": "hero", "label": "Home", "enabled": true },
-    { "id": "about", "label": "About", "enabled": true },
-    { "id": "services", "label": "Services", "enabled": true },
-    { "id": "skills", "label": "Stack", "enabled": true },
-    { "id": "projects", "label": "Work", "enabled": true },
-    { "id": "products", "label": "Store", "enabled": true },
-    { "id": "experience", "label": "Journey", "enabled": true },
-    { "id": "gallery", "label": "Gallery", "enabled": true },
-    { "id": "testimonials", "label": "Reviews", "enabled": false },
-    { "id": "contact", "label": "Contact", "enabled": true }
+  "pages": [
+    {
+      "id": "home",
+      "label": "Home",
+      "slug": "",
+      "enabled": true,
+      "inNav": true,
+      "emoji": "🏠",
+      "blurb": "",
+      "seoTitle": ""
+    },
+    {
+      "id": "about",
+      "label": "About",
+      "slug": "about",
+      "enabled": true,
+      "inNav": true,
+      "emoji": "🪪",
+      "blurb": "My student ID, my story and what keeps me up at night.",
+      "seoTitle": ""
+    },
+    {
+      "id": "services",
+      "label": "Services",
+      "slug": "services",
+      "enabled": true,
+      "inNav": false,
+      "emoji": "🛠️",
+      "blurb": "Things I do (instead of homework).",
+      "seoTitle": ""
+    },
+    {
+      "id": "skills",
+      "label": "Skills",
+      "slug": "skills",
+      "enabled": true,
+      "inNav": true,
+      "emoji": "📝",
+      "blurb": "My report card. Actual marks, no tuition.",
+      "seoTitle": ""
+    },
+    {
+      "id": "projects",
+      "label": "Projects",
+      "slug": "projects",
+      "enabled": true,
+      "inNav": true,
+      "emoji": "📂",
+      "blurb": "Assignments I actually submitted. On time. Mostly.",
+      "seoTitle": ""
+    },
+    {
+      "id": "products",
+      "label": "Store",
+      "slug": "store",
+      "enabled": true,
+      "inNav": true,
+      "emoji": "🍟",
+      "blurb": "The canteen — templates, bots and custom builds.",
+      "seoTitle": ""
+    },
+    {
+      "id": "experience",
+      "label": "Journey",
+      "slug": "journey",
+      "enabled": true,
+      "inNav": false,
+      "emoji": "🗓️",
+      "blurb": "My timetable, from hello world till now.",
+      "seoTitle": ""
+    },
+    {
+      "id": "gallery",
+      "label": "Gallery",
+      "slug": "gallery",
+      "enabled": true,
+      "inNav": false,
+      "emoji": "📸",
+      "blurb": "Polaroids from off the clock.",
+      "seoTitle": ""
+    },
+    {
+      "id": "playground",
+      "label": "Playground",
+      "slug": "playground",
+      "enabled": true,
+      "inNav": true,
+      "emoji": "🎮",
+      "blurb": "Doodle on my desk, toss paper balls, get homework excuses.",
+      "seoTitle": ""
+    },
+    {
+      "id": "testimonials",
+      "label": "Reviews",
+      "slug": "reviews",
+      "enabled": false,
+      "inNav": false,
+      "emoji": "💌",
+      "blurb": "Notes passed by classmates and clients.",
+      "seoTitle": ""
+    },
+    {
+      "id": "contact",
+      "label": "Contact",
+      "slug": "contact",
+      "enabled": true,
+      "inNav": true,
+      "emoji": "✉️",
+      "blurb": "Pass me a note — or slide into my DMs.",
+      "seoTitle": ""
+    }
   ],
   "hero": {
-    "greeting": "hello world, i'm",
+    "badge": "📍 last bench · Delhi",
+    "greeting": "hey, i'm",
     "name": "Aarav",
-    "roles": ["Full-Stack Developer", "Game Builder", "Discord Bot Maker", "UI Designer", "A different kind of ordinary"],
-    "tagline": "I build fast, beautiful websites, apps, bots and games — quietly, obsessively, pixel by pixel. Silent moves. Loud dreams.",
-    "visual": "terminal",
-    "avatar": "/assets/profile.jpg",
-    "backgroundImage": "",
+    "rolePrefix": "",
+    "roles": [
+      "full-stack developer",
+      "game builder",
+      "discord bot maker",
+      "UI designer",
+      "a different kind of ordinary"
+    ],
+    "tagline": "Teachers called me a *backbencher*. I just sat where the Wi-Fi was better. I build fast, beautiful websites, apps, bots and games — silent moves, loud dreams.",
+    "avatar": "/assets/profile.webp",
+    "photoCaption": "caught in 4K 📸",
+    "photoArrowText": "that's me!",
+    "stickyNote": "Silent moves.\nLoud dreams. ♡",
     "availableBadge": true,
-    "availableText": "Available for freelance projects",
-    "primaryButtonText": "View my work",
-    "primaryButtonLink": "#projects",
-    "secondaryButtonText": "Let's talk",
-    "secondaryButtonLink": "#contact",
+    "availableText": "Open for freelance work",
+    "primaryButtonText": "See my work",
+    "primaryButtonLink": "/projects",
+    "secondaryButtonText": "Pass me a note",
+    "secondaryButtonLink": "/contact",
     "showSocials": true,
-    "terminalTitle": "aarav.exe — zsh",
-    "terminalIntro": [
-      { "command": "whoami", "output": "aarav — developer · creator · dreamer" },
-      { "command": "cat interests.txt", "output": "⚽ CR7  ·  🎮 gaming  ·  🕷️ spider-verse  ·  💻 code" },
-      { "command": "echo $MOTTO", "output": "silent moves. loud dreams." }
-    ],
-    "terminalCommands": [
-      { "command": "motto", "output": "Silent moves. Loud dreams. ♡" },
-      { "command": "cr7", "output": "SIUUUU! ⚽ Hard work beats talent when talent doesn't work hard." },
-      { "command": "spider", "output": "🕷️ With great code comes great responsibility." },
-      { "command": "hire", "output": "Let's build something loud → scroll to #contact or email me." },
-      { "command": "game", "output": "🎮 Currently grinding ranked. Ask me for a 1v1." }
-    ],
     "stats": [
-      { "value": "25+", "label": "Projects shipped" },
-      { "value": "3+", "label": "Years coding" },
-      { "value": "100%", "label": "Passion" }
+      {
+        "value": "25+",
+        "label": "projects shipped"
+      },
+      {
+        "value": "3+",
+        "label": "years coding"
+      },
+      {
+        "value": "0",
+        "label": "homework done"
+      }
+    ]
+  },
+  "home": {
+    "marquee": true,
+    "exploreEnabled": true,
+    "exploreHeading": "Pick a page from my notebook",
+    "exploreSub": "Every page is a different chapter. Some are even interesting.",
+    "terminalEnabled": true,
+    "terminalHeading": "The class computer",
+    "terminalSub": "Go on — type something. Nobody's watching. (try *help*)",
+    "featuredEnabled": true,
+    "featuredHeading": "Teacher's favourite",
+    "featuredSub": "The assignment I'm most proud of.",
+    "ctaEnabled": true,
+    "ctaHeading": "Got an idea? *Pass me a note.*",
+    "ctaText": "Websites, bots, games or just football talk — I reply faster than the teacher catches me.",
+    "ctaButton": "Write a note",
+    "ctaLink": "/contact"
+  },
+  "terminal": {
+    "title": "class-computer — zsh",
+    "intro": [
+      {
+        "command": "whoami",
+        "output": "aarav — developer · backbencher · dreamer"
+      },
+      {
+        "command": "cat timetable.txt",
+        "output": "⚽ CR7 · 🎮 gaming · 🕷️ spider-verse · 💻 code (all periods)"
+      },
+      {
+        "command": "echo $MOTTO",
+        "output": "silent moves. loud dreams."
+      }
+    ],
+    "commands": [
+      {
+        "command": "motto",
+        "output": "Silent moves. Loud dreams. ♡"
+      },
+      {
+        "command": "cr7",
+        "output": "SIUUUU! ⚽ Hard work beats talent when talent doesn't work hard."
+      },
+      {
+        "command": "spider",
+        "output": "🕷️ With great code comes great responsibility."
+      },
+      {
+        "command": "homework",
+        "output": "404: homework not found. try again next semester."
+      },
+      {
+        "command": "hire",
+        "output": "Let's build something loud → type 'open contact'."
+      },
+      {
+        "command": "game",
+        "output": "🎮 Currently grinding ranked. 1v1 me after school."
+      }
     ]
   },
   "marquee": {
     "enabled": true,
     "items": [
-      { "name": "JavaScript", "icon": "javascript" },
-      { "name": "TypeScript", "icon": "typescript" },
-      { "name": "React", "icon": "react" },
-      { "name": "Next.js", "icon": "nextjs" },
-      { "name": "Node.js", "icon": "nodejs" },
-      { "name": "Python", "icon": "python" },
-      { "name": "Tailwind", "icon": "tailwind" },
-      { "name": "MongoDB", "icon": "mongodb" },
-      { "name": "Firebase", "icon": "firebase" },
-      { "name": "Three.js", "icon": "threejs" },
-      { "name": "Discord.js", "icon": "discord" },
-      { "name": "Git", "icon": "git" },
-      { "name": "Figma", "icon": "figma" },
-      { "name": "Unity", "icon": "unity" },
-      { "name": "Vercel", "icon": "vercel" },
-      { "name": "Linux", "icon": "linux" }
+      {
+        "name": "JavaScript",
+        "icon": "javascript"
+      },
+      {
+        "name": "TypeScript",
+        "icon": "typescript"
+      },
+      {
+        "name": "React",
+        "icon": "react"
+      },
+      {
+        "name": "Next.js",
+        "icon": "nextjs"
+      },
+      {
+        "name": "Node.js",
+        "icon": "nodejs"
+      },
+      {
+        "name": "Python",
+        "icon": "python"
+      },
+      {
+        "name": "Tailwind",
+        "icon": "tailwind"
+      },
+      {
+        "name": "MongoDB",
+        "icon": "mongodb"
+      },
+      {
+        "name": "Firebase",
+        "icon": "firebase"
+      },
+      {
+        "name": "Three.js",
+        "icon": "threejs"
+      },
+      {
+        "name": "Discord.js",
+        "icon": "discord"
+      },
+      {
+        "name": "Git",
+        "icon": "git"
+      },
+      {
+        "name": "Figma",
+        "icon": "figma"
+      },
+      {
+        "name": "Unity",
+        "icon": "unity"
+      },
+      {
+        "name": "Vercel",
+        "icon": "vercel"
+      },
+      {
+        "name": "Linux",
+        "icon": "linux"
+      }
     ]
   },
   "about": {
-    "heading": "A different kind of ordinary.",
+    "heading": "Not a topper. *A builder.*",
     "subheading": "Somewhere between dreams & reality — that's where I build.",
-    "bio": "I'm Aarav, a self-taught developer from Delhi, India. I fell in love with code because it lets me turn the wild ideas in my head into real things people can click, play and use.\n\nI design and build websites, web apps, Discord bots and small games — with a big focus on speed, clean design and the tiny details most people never notice. I don't talk much about what I'm building. I just ship it.",
-    "photo": "/assets/profile.jpg",
+    "note": "a different kind of ordinary ✦",
+    "bioTitle": "About me",
+    "bio": "I'm Aarav, a self-taught developer from Delhi, India. While the class was copying notes from the board, I was on the last bench sketching app ideas in the margins — and then going home to actually build them.\n\nI design and build websites, web apps, Discord bots and small games, with a big focus on speed, clean design and the tiny details most people never notice. I don't talk much about what I'm building. I just ship it.",
+    "photo": "/assets/profile.webp",
     "location": "Delhi, India",
     "timezone": "Asia/Kolkata",
     "quote": "Silent moves. Loud dreams.",
     "resumeText": "Download CV",
     "resumeLink": "",
+    "idCard": {
+      "enabled": true,
+      "school": "LAST BENCH ACADEMY",
+      "title": "STUDENT ID",
+      "rows": [
+        {
+          "label": "Name",
+          "value": "Aarav"
+        },
+        {
+          "label": "Roll no.",
+          "value": "07 (CR7, obviously)"
+        },
+        {
+          "label": "Class",
+          "value": "Last bench · Section Dev"
+        },
+        {
+          "label": "Hobbies",
+          "value": "Code · Football · Gaming"
+        },
+        {
+          "label": "Valid till",
+          "value": "Forever"
+        }
+      ],
+      "signature": "Aarav",
+      "backTitle": "If found, please return to the last bench.",
+      "backText": "Holder of this card is allowed to skip boring lectures, build cool stuff and reply to DMs at 2 AM."
+    },
     "currently": [
-      { "label": "Building", "value": "Next-gen portfolio & a browser game" },
-      { "label": "Learning", "value": "TypeScript, Three.js & system design" },
-      { "label": "Playing", "value": "Ranked matches after commits 🎮" }
+      {
+        "label": "Building",
+        "value": "this portfolio & a browser game"
+      },
+      {
+        "label": "Learning",
+        "value": "TypeScript, Three.js & system design"
+      },
+      {
+        "label": "Playing",
+        "value": "ranked matches after commits 🎮"
+      },
+      {
+        "label": "Avoiding",
+        "value": "homework (since 2019)"
+      }
     ],
     "interests": [
-      { "emoji": "⚽", "title": "CR7 forever", "text": "Discipline, hard work and never settling — Ronaldo's mindset, in code." },
-      { "emoji": "🎮", "title": "Gamer", "text": "Games taught me strategy, patience and how great UX should feel." },
-      { "emoji": "🕷️", "title": "Spider-verse", "text": "A different kind of ordinary. With great code comes great responsibility." },
-      { "emoji": "🥀", "title": "Dreamer", "text": "Somewhere between dreams & reality — that's where the best ideas live." }
+      {
+        "emoji": "⚽",
+        "title": "CR7 forever",
+        "text": "Discipline, hard work, never settling — Ronaldo's mindset, in code."
+      },
+      {
+        "emoji": "🎮",
+        "title": "Gamer",
+        "text": "Games taught me strategy, patience and how great UX should feel."
+      },
+      {
+        "emoji": "🕷️",
+        "title": "Spider-verse",
+        "text": "A different kind of ordinary. With great code comes great responsibility."
+      },
+      {
+        "emoji": "🥀",
+        "title": "Dreamer",
+        "text": "Somewhere between dreams & reality — where the best ideas live."
+      }
     ],
     "stats": [
-      { "value": "3+", "label": "Years coding" },
-      { "value": "25+", "label": "Projects built" },
-      { "value": "10+", "label": "Happy clients" },
-      { "value": "1000+", "label": "Commits pushed" }
+      {
+        "value": "3+",
+        "label": "years coding"
+      },
+      {
+        "value": "25+",
+        "label": "projects built"
+      },
+      {
+        "value": "10+",
+        "label": "happy clients"
+      },
+      {
+        "value": "1000+",
+        "label": "commits pushed"
+      }
     ]
   },
   "services": {
-    "heading": "What I do",
+    "heading": "Things I do *instead of homework*",
     "subheading": "From idea to launch — design, code and everything in between.",
+    "note": "all periods, no breaks",
     "items": [
-      { "icon": "monitor", "title": "Websites & Landing pages", "description": "Lightning-fast, responsive, animated websites that make people stop scrolling." },
-      { "icon": "app-window", "title": "Web Apps", "description": "Full-stack apps with auth, dashboards, databases and real-time features." },
-      { "icon": "bot", "title": "Discord Bots", "description": "Moderation, economy, music, tickets & custom commands — built for your server." },
-      { "icon": "gamepad-2", "title": "Browser Games", "description": "Small, addictive web games with smooth controls and neon vibes." },
-      { "icon": "pen-tool", "title": "UI / UX Design", "description": "Clean interfaces and design systems designed in Figma, built pixel-perfect." },
-      { "icon": "zap", "title": "Automation", "description": "Scripts & tools that save hours — scrapers, workflows and integrations." }
+      {
+        "icon": "monitor",
+        "title": "Websites & Landing pages",
+        "description": "Lightning-fast, responsive, animated websites that make people stop scrolling."
+      },
+      {
+        "icon": "app-window",
+        "title": "Web Apps",
+        "description": "Full-stack apps with auth, dashboards, databases and real-time features."
+      },
+      {
+        "icon": "bot",
+        "title": "Discord Bots",
+        "description": "Moderation, economy, music, tickets & custom commands — built for your server."
+      },
+      {
+        "icon": "gamepad-2",
+        "title": "Browser Games",
+        "description": "Small, addictive web games with smooth controls and big vibes."
+      },
+      {
+        "icon": "pen-tool",
+        "title": "UI / UX Design",
+        "description": "Clean interfaces and design systems designed in Figma, built pixel-perfect."
+      },
+      {
+        "icon": "zap",
+        "title": "Automation",
+        "description": "Scripts & tools that save hours — scrapers, workflows and integrations."
+      }
     ]
   },
   "skills": {
-    "heading": "Tech stack",
-    "subheading": "The tools I use to bring ideas to life.",
+    "heading": "My *report card*",
+    "subheading": "The only subjects I never bunked.",
+    "note": "no tuition, all self-study",
+    "school": "LAST BENCH ACADEMY",
+    "reportTitle": "Progress Report",
+    "term": "Session 2026",
+    "student": "Aarav",
+    "rollNo": "07",
+    "resultStamp": "PROMOTED ✓",
+    "overallRemark": "Talks less, ships more. Distracts the whole class with cool projects. Please don't change.",
+    "teacherSign": "Class Teacher",
+    "principalSign": "Principal",
+    "grades": [
+      {
+        "min": 90,
+        "grade": "A+"
+      },
+      {
+        "min": 80,
+        "grade": "A"
+      },
+      {
+        "min": 70,
+        "grade": "B+"
+      },
+      {
+        "min": 60,
+        "grade": "B"
+      },
+      {
+        "min": 50,
+        "grade": "C"
+      },
+      {
+        "min": 0,
+        "grade": "D"
+      }
+    ],
     "items": [
-      { "name": "HTML & CSS", "level": 95, "category": "Frontend" },
-      { "name": "JavaScript / TypeScript", "level": 90, "category": "Frontend" },
-      { "name": "React / Next.js", "level": 84, "category": "Frontend" },
-      { "name": "Tailwind CSS", "level": 90, "category": "Frontend" },
-      { "name": "Node.js & Express", "level": 86, "category": "Backend" },
-      { "name": "Python", "level": 80, "category": "Backend" },
-      { "name": "MongoDB / Firebase", "level": 78, "category": "Backend" },
-      { "name": "REST APIs", "level": 85, "category": "Backend" },
-      { "name": "Git & GitHub", "level": 88, "category": "Tools & more" },
-      { "name": "Discord.js", "level": 90, "category": "Tools & more" },
-      { "name": "Figma", "level": 74, "category": "Tools & more" },
-      { "name": "Unity / Game dev", "level": 65, "category": "Tools & more" }
+      {
+        "name": "HTML & CSS",
+        "level": 95,
+        "category": "Frontend",
+        "remark": "Can center a div blindfolded."
+      },
+      {
+        "name": "JavaScript / TypeScript",
+        "level": 90,
+        "category": "Frontend",
+        "remark": "Dreams in callbacks."
+      },
+      {
+        "name": "React / Next.js",
+        "level": 84,
+        "category": "Frontend",
+        "remark": "Hooks everything."
+      },
+      {
+        "name": "Tailwind CSS",
+        "level": 90,
+        "category": "Frontend",
+        "remark": "Class names longer than essays."
+      },
+      {
+        "name": "Node.js & Express",
+        "level": 86,
+        "category": "Backend",
+        "remark": "Servers never sleep. Neither does he."
+      },
+      {
+        "name": "Python",
+        "level": 80,
+        "category": "Backend",
+        "remark": "Indents properly, unlike his notebook."
+      },
+      {
+        "name": "MongoDB / Firebase",
+        "level": 78,
+        "category": "Backend",
+        "remark": "Stores data better than homework."
+      },
+      {
+        "name": "REST APIs",
+        "level": 85,
+        "category": "Backend",
+        "remark": "GETs it."
+      },
+      {
+        "name": "Git & GitHub",
+        "level": 88,
+        "category": "Tools & more",
+        "remark": "Commits more than he studies."
+      },
+      {
+        "name": "Discord.js",
+        "level": 90,
+        "category": "Tools & more",
+        "remark": "His bots have better attendance."
+      },
+      {
+        "name": "Figma",
+        "level": 74,
+        "category": "Tools & more",
+        "remark": "Doodles, but professionally."
+      },
+      {
+        "name": "Unity / Game dev",
+        "level": 65,
+        "category": "Tools & more",
+        "remark": "Needs to play less, build more."
+      }
     ]
   },
   "projects": {
-    "heading": "Selected work",
+    "heading": "Assignments I *actually submitted*",
     "subheading": "A few things I've designed, built and shipped.",
+    "note": "on time. mostly.",
+    "searchEnabled": true,
     "items": [
       {
         "title": "Nebula Dashboard",
         "description": "A real-time analytics dashboard with live charts, dark mode, role-based access and blazing-fast filtering.",
-        "image": "/assets/project-1.jpg",
-        "tags": ["Next.js", "Node.js", "MongoDB"],
+        "details": "Built for a small business that needed to see their sales live. Charts update over websockets, filters run instantly on 100k+ rows and the whole thing works offline.\n\nStack: Next.js, Node.js, MongoDB, Chart.js.",
+        "image": "/assets/project-1.webp",
+        "tags": [
+          "Next.js",
+          "Node.js",
+          "MongoDB"
+        ],
         "year": "2026",
+        "grade": "A+",
         "liveUrl": "https://example.com",
         "codeUrl": "https://github.com/aaravgyt782013-netizen",
         "featured": true
       },
       {
         "title": "Neon Runner",
-        "description": "A fast-paced cyberpunk platformer that runs right in the browser — rooftops, combos and a global leaderboard.",
-        "image": "/assets/project-2.jpg",
-        "tags": ["JavaScript", "Canvas", "Game"],
+        "description": "A fast-paced rooftop platformer that runs right in the browser — combos, coins and a global leaderboard.",
+        "details": "A canvas game with custom physics, controller support and a serverless leaderboard. Started as a doodle in my maths notebook.",
+        "image": "/assets/project-2.webp",
+        "tags": [
+          "JavaScript",
+          "Canvas",
+          "Game"
+        ],
         "year": "2026",
+        "grade": "A",
         "liveUrl": "https://example.com",
         "codeUrl": "https://github.com/aaravgyt782013-netizen",
         "featured": false
@@ -201,19 +639,31 @@
       {
         "title": "GOAT Stats",
         "description": "A football stats tracker with player heatmaps, goal timelines and head-to-head comparisons. SIUUU.",
-        "image": "/assets/project-3.jpg",
-        "tags": ["React", "API", "Charts"],
+        "details": "Pulls live match data, draws heatmaps on a pitch and lets you compare any two players. Yes, Ronaldo wins every comparison.",
+        "image": "/assets/project-3.webp",
+        "tags": [
+          "React",
+          "API",
+          "Charts"
+        ],
         "year": "2025",
+        "grade": "A+",
         "liveUrl": "https://example.com",
         "codeUrl": "https://github.com/aaravgyt782013-netizen",
         "featured": false
       },
       {
         "title": "Study Buddy AI",
-        "description": "An AI study companion that explains concepts, generates quizzes and summarizes notes in seconds.",
-        "image": "/assets/project-4.jpg",
-        "tags": ["Python", "AI", "Next.js"],
+        "description": "An AI study companion that explains concepts, makes quizzes and summarizes notes in seconds.",
+        "details": "Ironically, the backbencher built the study app. Upload notes, get flashcards and quizzes, and ask questions in plain English.",
+        "image": "/assets/project-4.webp",
+        "tags": [
+          "Python",
+          "AI",
+          "Next.js"
+        ],
         "year": "2025",
+        "grade": "A",
         "liveUrl": "",
         "codeUrl": "https://github.com/aaravgyt782013-netizen",
         "featured": false
@@ -221,44 +671,58 @@
     ]
   },
   "products": {
-    "heading": "Store & services",
-    "subheading": "Templates, bots and custom builds — ready when you are.",
+    "heading": "The *canteen*",
+    "subheading": "Templates, bots and custom builds — fresh every day.",
+    "note": "no samosas, sorry",
     "items": [
       {
         "name": "Dark UI Template Pack",
         "description": "10 premium, animated landing page templates. Fully responsive. Copy, paste, launch.",
-        "image": "/assets/product-1.jpg",
+        "image": "/assets/product-1.webp",
         "price": "₹499",
         "badge": "Bestseller",
-        "features": ["10 templates", "HTML + Tailwind", "Free updates"],
-        "buttonText": "Get it now",
+        "features": [
+          "10 templates",
+          "HTML + Tailwind",
+          "Free updates"
+        ],
+        "buttonText": "Grab it",
         "link": "https://example.com"
       },
       {
         "name": "Custom Discord Bot",
         "description": "Your own bot with moderation, levels, tickets, music & custom commands — hosted and ready.",
-        "image": "/assets/product-2.jpg",
+        "image": "/assets/product-2.webp",
         "price": "From ₹999",
         "badge": "Popular",
-        "features": ["Custom commands", "Dashboard", "24/7 hosting help"],
+        "features": [
+          "Custom commands",
+          "Dashboard",
+          "Hosting help"
+        ],
         "buttonText": "Order now",
-        "link": "#contact"
+        "link": "/contact"
       },
       {
         "name": "Website Design & Build",
         "description": "A custom website for your brand, channel or business — designed and coded from scratch.",
-        "image": "/assets/product-3.jpg",
+        "image": "/assets/product-3.webp",
         "price": "From ₹2,999",
         "badge": "Service",
-        "features": ["Custom design", "SEO ready", "Admin panel"],
+        "features": [
+          "Custom design",
+          "SEO ready",
+          "Admin panel"
+        ],
         "buttonText": "Start a project",
-        "link": "#contact"
+        "link": "/contact"
       }
     ]
   },
   "experience": {
-    "heading": "The journey",
+    "heading": "My *timetable*",
     "subheading": "Every expert was once a beginner who refused to quit.",
+    "note": "period by period",
     "items": [
       {
         "period": "2026 — Now",
@@ -276,33 +740,106 @@
         "period": "2024",
         "role": "First paid project",
         "company": "Discord community",
-        "description": "Built a custom Discord bot for a gaming server — and realized code could be a career."
+        "description": "Built a custom Discord bot for a gaming server — and realised code could be a career."
       },
       {
         "period": "2023",
         "role": "console.log('hello world')",
-        "company": "Where it all began",
-        "description": "Started with HTML & CSS, fell in love with building things, and never stopped."
+        "company": "The last bench",
+        "description": "Started with HTML & CSS during a boring lecture, fell in love with building things, never stopped."
       }
     ]
   },
   "gallery": {
-    "heading": "Off the clock",
+    "heading": "The *polaroid wall*",
     "subheading": "Setups, builds and the things that inspire me.",
+    "note": "tap a photo to zoom",
     "instagramHandle": "@aaravg782013.exe",
     "instagramUrl": "https://www.instagram.com/aaravg782013.exe/",
     "items": [
-      { "image": "/assets/profile.jpg", "caption": "Silent moves. Loud dreams.", "link": "" },
-      { "image": "/assets/gallery-setup.jpg", "caption": "Where the magic happens", "link": "" },
-      { "image": "/assets/gallery-football.jpg", "caption": "⚽ CR7 mentality", "link": "" },
-      { "image": "/assets/project-2.jpg", "caption": "🎮 Neon Runner in progress", "link": "" },
-      { "image": "/assets/project-4.jpg", "caption": "Experimenting with AI", "link": "" },
-      { "image": "/assets/product-2.jpg", "caption": "Bot mascot v2", "link": "" }
+      {
+        "image": "/assets/profile.webp",
+        "caption": "silent moves. loud dreams.",
+        "link": ""
+      },
+      {
+        "image": "/assets/gallery-lastbench.webp",
+        "caption": "my office, aka the last bench",
+        "link": ""
+      },
+      {
+        "image": "/assets/gallery-setup.webp",
+        "caption": "where the magic happens",
+        "link": ""
+      },
+      {
+        "image": "/assets/gallery-football.webp",
+        "caption": "⚽ CR7 mentality",
+        "link": ""
+      },
+      {
+        "image": "/assets/project-2.webp",
+        "caption": "neon runner — maths notebook edition",
+        "link": ""
+      },
+      {
+        "image": "/assets/product-2.webp",
+        "caption": "bot mascot v2",
+        "link": ""
+      }
+    ]
+  },
+  "playground": {
+    "heading": "Last bench *arcade*",
+    "subheading": "Things we did when the teacher wasn't looking.",
+    "note": "warning: highly addictive",
+    "doodleEnabled": true,
+    "doodleTitle": "Doodle on my desk",
+    "doodleText": "Draw anything. Seriously, anything. Then save it.",
+    "doodleColors": [
+      "#f2efe6",
+      "#ffd60a",
+      "#ff5a5f",
+      "#5ec8ff",
+      "#b8f0a0",
+      "#ffb3c7"
+    ],
+    "tossEnabled": true,
+    "tossTitle": "Paper toss",
+    "tossText": "Drag the paper ball and let go to throw it into the bin. Mind the fan!",
+    "tossHit": [
+      "Swish! 🗑️",
+      "SIUUU! ⚽",
+      "Nothing but bin!",
+      "Teacher didn't see that 😏"
+    ],
+    "tossMiss": [
+      "So close…",
+      "The fan got you 🌀",
+      "Try again, legend",
+      "Miss! Detention for you."
+    ],
+    "excuseEnabled": true,
+    "excuseTitle": "Homework excuse generator",
+    "excuseText": "Tested on real teachers. Results may vary.",
+    "excuseButton": "Generate excuse",
+    "excuses": [
+      "My code ate my homework.",
+      "I was debugging my life, sir.",
+      "Git merge conflict deleted it.",
+      "It's in the cloud. The cloud is down.",
+      "I wrote it, but it's in production now.",
+      "My laptop updated for 4 hours.",
+      "Ronaldo had a match. Priorities.",
+      "I finished it, but forgot to push.",
+      "It works on my machine. Just not on paper.",
+      "Spider-man needed help. You understand."
     ]
   },
   "testimonials": {
-    "heading": "Kind words",
+    "heading": "Notes from *classmates*",
     "subheading": "What people say about working with me.",
+    "note": "unedited, I promise",
     "items": [
       {
         "name": "Rohan S.",
@@ -319,20 +856,180 @@
     ]
   },
   "contact": {
-    "heading": "Let's build something loud.",
-    "subheading": "Have a project, an idea or just want to talk football and games? My inbox is always open.",
-    "email": "hello@example.com",
+    "heading": "Pass me *a note.*",
+    "subheading": "Have a project, an idea, or just want to talk football and games? My inbox (and DMs) are always open.",
+    "note": "the teacher won't see it",
+    "email": "aaravgyt782013@gmail.com",
     "phone": "",
     "whatsapp": "",
     "location": "Delhi, India",
+    "instagramEnabled": true,
+    "instagramHandle": "@aaravg782013.exe",
+    "instagramUrl": "https://www.instagram.com/aaravg782013.exe/",
+    "instagramText": "Slide into my DMs — I reply faster there.",
+    "instagramButton": "Open Instagram",
     "formEnabled": true,
-    "successMessage": "Message received ✓ — I'll get back to you soon. Silent moves, fast replies."
+    "formTitle": "Write a note",
+    "successMessage": "Note delivered ✈️ — I'll get back to you soon. Silent moves, fast replies."
+  },
+  "teacher": {
+    "enabled": true,
+    "hotkey": "t",
+    "tabTitle": "Physics Notes — Chapter 7",
+    "subject": "PHYSICS — CLASS NOTES",
+    "title": "Chapter 7: Laws of Motion",
+    "notes": "1. Newton's First Law (Law of Inertia): An object at rest stays at rest and an object in motion stays in motion with the same speed and direction unless acted upon by an unbalanced force.\n\n2. Newton's Second Law: The acceleration of an object depends on the net force acting on it and its mass. F = m × a.\n\n3. Newton's Third Law: For every action, there is an equal and opposite reaction.\n\nImportant: Learn all three laws with examples for the unit test on Monday. Revise numericals from exercise 7.2 (Q1 – Q15).\n\nHomework: Complete worksheet 7B and submit before Friday.",
+    "footer": "press T or click anywhere to go back to the fun"
+  },
+  "notFound": {
+    "slipTitle": "DETENTION SLIP",
+    "heading": "404 — this page *bunked class.*",
+    "nameLabel": "Name",
+    "nameValue": "You 👀",
+    "offenseLabel": "Offense",
+    "offense": "Wandered into a page that doesn't exist.",
+    "punishmentLabel": "Punishment",
+    "punishment": "Go back home and write “I will not type random URLs” 100 times.",
+    "button": "Back to home",
+    "sign": "The Principal"
+  },
+  "labels": {
+    "general": {
+      "pageWord": "page",
+      "nextPage": "Next page",
+      "backHome": "Back to home",
+      "backToTop": "Back to top",
+      "scroll": "scroll",
+      "copied": "Copied!",
+      "emailCopied": "Email copied to clipboard ✓",
+      "getInTouch": "Get in touch",
+      "openPage": "Open page",
+      "close": "Close",
+      "skipBoot": "skip →",
+      "teacherButton": "Teacher's coming! (T)",
+      "searchButton": "Search",
+      "themeButton": "Switch chalkboard / notebook"
+    },
+    "home": {
+      "featuredStamp": "TEACHER'S FAV",
+      "viewAllProjects": "See all assignments",
+      "gradeWord": "grade"
+    },
+    "about": {
+      "flipHint": "tap the card to flip it ↻",
+      "clockTitle": "Classroom clock",
+      "currentlyTitle": "Currently",
+      "interestsTitle": "What drives me",
+      "interestsHint": "psst — you can drag these around",
+      "quoteTitle": "Motto"
+    },
+    "skills": {
+      "subject": "Subject",
+      "marks": "Marks",
+      "grade": "Grade",
+      "remark": "Teacher's remark",
+      "student": "Student",
+      "rollNo": "Roll no.",
+      "overall": "Overall remark",
+      "outOf": "/100"
+    },
+    "projects": {
+      "all": "All",
+      "searchPlaceholder": "Search assignments…",
+      "noResults": "No assignments found. Probably bunked.",
+      "featured": "Teacher's fav",
+      "liveDemo": "Live demo",
+      "source": "Source",
+      "details": "Details"
+    },
+    "products": {
+      "featuresTitle": "What's inside"
+    },
+    "gallery": {
+      "follow": "Follow"
+    },
+    "playground": {
+      "clear": "Clear",
+      "eraser": "Eraser",
+      "pen": "Chalk",
+      "save": "Save PNG",
+      "size": "Size",
+      "score": "Score",
+      "best": "Best",
+      "fan": "Fan",
+      "tossHint": "pull the ball back & let go ↗",
+      "drawHere": "✎ draw here"
+    },
+    "contact": {
+      "emailLabel": "Email",
+      "phoneLabel": "Phone",
+      "whatsappLabel": "WhatsApp",
+      "locationLabel": "Based in",
+      "socialsLabel": "Find me on",
+      "name": "Your name",
+      "namePlaceholder": "Shah Rukh? Rohan? Ronaldo?",
+      "email": "Your email",
+      "emailPlaceholder": "you@email.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Website, bot, collab, or just hi 👋",
+      "message": "Your note",
+      "messagePlaceholder": "Write it like the teacher isn't watching…",
+      "send": "Fold & send",
+      "sending": "Folding into a paper plane…",
+      "error": "Please fill in your name, a valid email and a message.",
+      "writeAnother": "Write another note"
+    },
+    "footer": {
+      "pages": "Pages",
+      "connect": "Connect",
+      "contact": "Contact",
+      "commandMenu": "Command menu"
+    },
+    "cmdk": {
+      "placeholder": "Type a command or search…",
+      "empty": "No results. Try “projects” or “email”.",
+      "pages": "Pages",
+      "actions": "Actions",
+      "socials": "Socials",
+      "copyEmail": "Copy email address",
+      "sendEmail": "Send me an email",
+      "toggleTheme": "Switch chalkboard / notebook mode",
+      "downloadCv": "Download CV",
+      "openTerminal": "Open the class computer",
+      "teacherMode": "Teacher's coming! (hide everything)",
+      "navigate": "navigate",
+      "select": "select"
+    },
+    "terminal": {
+      "hint": "type help and press enter ↵",
+      "notFound": "command not found: {cmd}. type \"help\""
+    }
   },
   "socials": [
-    { "platform": "instagram", "label": "Instagram", "url": "https://www.instagram.com/aaravg782013.exe/" },
-    { "platform": "github", "label": "GitHub", "url": "https://github.com/aaravgyt782013-netizen" },
-    { "platform": "discord", "label": "Discord", "url": "https://discord.com/" },
-    { "platform": "youtube", "label": "YouTube", "url": "https://youtube.com/" },
-    { "platform": "email", "label": "Email", "url": "mailto:hello@example.com" }
+    {
+      "platform": "instagram",
+      "label": "Instagram",
+      "url": "https://www.instagram.com/aaravg782013.exe/"
+    },
+    {
+      "platform": "github",
+      "label": "GitHub",
+      "url": "https://github.com/aaravgyt782013-netizen"
+    },
+    {
+      "platform": "discord",
+      "label": "Discord",
+      "url": "https://discord.com/"
+    },
+    {
+      "platform": "youtube",
+      "label": "YouTube",
+      "url": "https://youtube.com/"
+    },
+    {
+      "platform": "email",
+      "label": "Email",
+      "url": "mailto:aaravgyt782013@gmail.com"
+    }
   ]
 }
