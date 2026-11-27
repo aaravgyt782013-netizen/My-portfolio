@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin Panel · Portfolio</title>
+  <link rel="icon" href="/favicon.svg" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+  <script>if (!localStorage.getItem('pf-admin-token')) location.replace('/admin/login');</script>
+</head>
+<body class="admin-body">
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><span class="brand-ic" id="brand-ic"></span><div><strong>Portfolio</strong><small>Admin panel</small></div></div>
+      <nav class="side-nav" id="side-nav"></nav>
+      <div class="side-foot">
+        <div class="who" id="who"></div>
+        <button class="a-btn ghost block" id="logout-btn"></button>
+      </div>
+    </aside>
+    <div class="side-overlay" id="side-overlay"></div>
+
+    <div class="main-col">
+      <header class="topbar">
+        <button class="a-icon-btn mobile-only" id="side-toggle" aria-label="Menu"></button>
+        <div class="tb-title"><h1 id="page-title">Dashboard</h1><span class="dirty-dot" id="dirty" hidden>Unsaved changes</span></div>
+        <div class="tb-actions">
+          <button class="a-btn ghost" id="preview-btn" title="Toggle live preview"></button>
+          <a class="a-btn ghost" href="/" target="_blank" rel="noopener" id="view-btn"></a>
+          <button class="a-btn primary" id="save-btn" disabled></button>
+        </div>
+      </header>
+      <div class="workspace" id="workspace">
+        <div class="editor" id="editor"><div class="loading">Loading…</div></div>
+        <div class="preview-pane" id="preview-pane" hidden>
+          <div class="pv-bar">
+            <span>Live preview</span>
+            <div class="pv-devices">
+              <button data-w="100%" class="active" title="Desktop" id="pv-desktop"></button>
+              <button data-w="420px" title="Mobile" id="pv-mobile"></button>
+            </div>
+          </div>
+          <div class="pv-frame-wrap"><iframe id="preview-frame" title="Live preview" src="about:blank"></iframe></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="media-modal" hidden>
+    <div class="modal-card">
+      <div class="modal-head"><h3>Choose an image</h3><button class="a-icon-btn" id="media-close" aria-label="Close"></button></div>
+      <div class="modal-body" id="media-modal-body"></div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <input type="file" id="hidden-file" hidden />
+
+  <script src="/js/icons.js"></script>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

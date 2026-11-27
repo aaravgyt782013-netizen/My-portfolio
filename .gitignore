@@ -1,0 +1,10 @@
+node_modules/
+.env
+# runtime data created by the admin panel
+data/content.json
+data/messages.json
+data/*.tmp
+uploads/*
+!uploads/.gitkeep
+.DS_Store
+npm-debug.log*
