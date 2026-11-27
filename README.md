@@ -30,6 +30,13 @@ Fun extras:
 - `Ctrl/⌘ + K` command menu, a chalk-dust trail, a pencil cursor, page-flip transitions and an "attendance" boot screen
 - Terminal commands: `help`, `whoami`, `cd projects`, `open instagram`, `excuse`, `teacher`, plus your own commands
 
+**Works on every screen**
+- Tested from small 320px phones to 1920px monitors, including tablets and landscape phones. Nothing scrolls sideways or gets cut off.
+- Touch controls: the doodle board, paper toss, ID-card flip and swipe-through photo lightbox all work by finger. Hover effects never "stick" after a tap.
+- iPhone notch and home-bar safe areas are respected. Inputs don't trigger auto-zoom.
+- On small phones, teacher mode and the theme switch move into the ☰ menu.
+- The admin panel works on a phone too: slide-out sidebar and full-screen live preview.
+
 **Fast loading**
 - Each page is served as one ~11 KB gzipped HTML file with all content inlined. There are no extra API calls before first paint.
 - Images are WebP and the hero photo is preloaded. Fonts load without blocking the page.

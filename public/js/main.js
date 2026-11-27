@@ -511,7 +511,7 @@
     return '<section class="page"><div class="container">' + pageHead('contact', c) +
       '<div class="contact-grid' + (c.formEnabled ? '' : ' single') + '">' +
         '<div class="contact-side">' +
-          (c.email ? '<div class="info-card email-card reveal"><span class="ii">' + I.ui('mail') + '</span><div class="ic-txt"><small class="mono">' + esc(L('contact', 'emailLabel')) + '</small><a href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a></div>' +
+          (c.email ? '<div class="info-card email-card reveal"><span class="ii">' + I.ui('mail') + '</span><div class="ic-txt"><small class="mono">' + esc(L('contact', 'emailLabel')) + '</small><a href="mailto:' + esc(c.email) + '">' + esc(c.email).replace('@', '<wbr>@') + '</a></div>' +
             '<button class="icon-btn" id="copy-email" type="button" aria-label="Copy email">' + I.ui('copy') + '</button></div>' : '') +
           (c.instagramEnabled && c.instagramUrl ? '<a class="insta-card reveal" ' + href(c.instagramUrl) + '><span class="ig-ic">' + I.brand('instagram') + '</span>' +
             '<div class="ic-txt"><b>' + esc(c.instagramHandle) + '</b><p>' + esc(c.instagramText) + '</p></div><span class="ig-btn">' + esc(c.instagramButton) + I.ui('arrow-up-right') + '</span></a>' : '') +
@@ -584,6 +584,10 @@
     var list = pageList();
     $('#nav-links').innerHTML = list.filter(function (p) { return p.inNav !== false; }).map(function (p) { return '<a ' + pageLink(p.id) + ' data-id="' + p.id + '">' + esc(p.label) + '<span class="nl-line">' + D.scribble + '</span></a>'; }).join('');
     $('#mobile-menu').innerHTML = '<div class="mm-inner">' + list.map(function (p, i) { return '<a ' + pageLink(p.id) + ' data-id="' + p.id + '" style="--d:' + i * 35 + 'ms"><span class="mono">' + pad(i) + '</span>' + esc(p.label) + '<em>' + esc(p.emoji || '') + '</em></a>'; }).join('') +
+      '<div class="mm-actions">' +
+        ((C.teacher || {}).enabled !== false ? '<button type="button" class="btn btn-ghost btn-sm" data-mm="teacher">' + I.ui('glasses') + esc(L('general', 'teacherButton')) + '</button>' : '') +
+        ((C.theme || {}).allowVisitorToggle !== false ? '<button type="button" class="btn btn-ghost btn-sm" data-mm="theme">' + I.ui('moon') + esc(L('general', 'themeButton')) + '</button>' : '') +
+      '</div>' +
       '<div class="mm-socials socials">' + socialLinks(C.socials) + '</div></div>';
     $('#cmdk-btn').hidden = !s.commandPalette;
     $('#cmdk-btn').innerHTML = I.ui('search') + '<span class="kb-label">' + esc(L('general', 'searchButton')) + '</span><kbd>' + (/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl') + ' K</kbd>';
@@ -1174,6 +1178,7 @@
     if (!mm) return;
     mm.hidden = !open;
     document.body.classList.toggle('menu-open', open);
+    document.body.classList.toggle('locked', open);
     btn.setAttribute('aria-expanded', open);
     btn.innerHTML = I.ui(open ? 'x' : 'menu');
   }
@@ -1208,6 +1213,11 @@
 
     $('#menu-btn').innerHTML = I.ui('menu');
     $('#menu-btn').addEventListener('click', function () { setMenu($('#mobile-menu').hidden); });
+    $('#mobile-menu').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-mm]'); if (!b) return;
+      setMenu(false);
+      if (b.dataset.mm === 'teacher') setTimeout(toggleTeacher, 120); else toggleTheme();
+    });
     $('#theme-toggle').addEventListener('click', toggleTheme);
     $('#teacher-btn').addEventListener('click', toggleTeacher);
     $('#teacher').addEventListener('click', function () { if (teacherOn) toggleTeacher(); });
@@ -1218,6 +1228,15 @@
     $('#lb-close').addEventListener('click', function () { lb.hidden = true; });
     $('#lb-prev').addEventListener('click', function () { openLightbox(lbIndex - 1); });
     $('#lb-next').addEventListener('click', function () { openLightbox(lbIndex + 1); });
+    // swipe left / right (and down to close) on touch screens
+    var sw = null;
+    lb.addEventListener('touchstart', function (e) { if (e.touches.length === 1) sw = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }, { passive: true });
+    lb.addEventListener('touchend', function (e) {
+      if (!sw) return;
+      var t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y; sw = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) openLightbox(lbIndex + (dx < 0 ? 1 : -1));
+      else if (dy > 90 && Math.abs(dy) > Math.abs(dx) * 1.3) lb.hidden = true;
+    }, { passive: true });
     lb.addEventListener('click', function (e) { if (e.target === lb || e.target.tagName === 'FIGURE') lb.hidden = true; });
     $('#modal').addEventListener('click', function (e) { if (e.target.id === 'modal' || e.target.closest('[data-close]')) closeModal(); else if (e.target.closest('a[data-link]')) closeModal(); });
 

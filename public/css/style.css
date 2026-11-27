@@ -596,7 +596,7 @@ a.info-card:hover { border-color: var(--primary); transform: translateX(4px); }
 .ii { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--primary-ink); flex: none; }
 .ii .icon { width: 21px; height: 21px; }
 .ic-txt { flex: 1; min-width: 0; }
-.ic-txt a, .ic-txt b { font-weight: 700; overflow-wrap: anywhere; }
+.ic-txt a, .ic-txt b { font-weight: 700; overflow-wrap: break-word; }
 .email-card a:hover { color: var(--primary-ink); }
 .go { color: var(--muted); }
 .insta-card { position: relative; display: flex; align-items: center; gap: 1rem; padding: 1.3rem 1.2rem; border-radius: var(--radius); color: #fff; overflow: hidden; background: linear-gradient(135deg, #f58529, #dd2a7b 45%, #8134af 75%, #515bd4); box-shadow: var(--shadow); transform: rotate(-1deg); transition: transform .3s var(--ease); flex-wrap: wrap; }
@@ -811,4 +811,106 @@ body:not(.no-anim) .ns-plane { animation: land 1s var(--ease) both; }
   .insta-card > span:nth-child(2), .insta-card > div { flex: 1 1 150px; min-width: 0; }
   .ig-btn { margin-left: auto; }
   .toss-msg { bottom: auto; top: 2.6rem; font-size: 1.35rem; }
+}
+
+/* =====================================================================
+   PC + MOBILE COMPATIBILITY
+   ===================================================================== */
+/* never allow sideways scrolling (clip keeps position: sticky working) */
+html, body { overflow-x: clip; max-width: 100%; }
+img, video, canvas, iframe { max-width: 100%; }
+button, a, input, select, textarea, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+/* iPhone notch / home bar (landscape + bottom) */
+.container { width: min(100% - 2.5rem - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px), var(--container)); }
+.to-top { right: calc(1.4rem + env(safe-area-inset-right, 0px)); bottom: calc(1.4rem + env(safe-area-inset-bottom, 0px)); }
+.toast { bottom: calc(1.6rem + env(safe-area-inset-bottom, 0px)); }
+.mobile-menu { padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); padding-left: calc(1.5rem + env(safe-area-inset-left, 0px)); padding-right: calc(1.5rem + env(safe-area-inset-right, 0px)); overscroll-behavior: contain; }
+.footer { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* bigger tap targets */
+.logo { padding: .45rem 0; }
+.search-box input { height: 100%; font-size: 16px; }
+
+/* grids can always shrink to the screen */
+.index-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.explore { grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.contact-grid > *, .about-grid > *, .hero-grid > *, .play-grid > *, .feature > *, .footer-top > * { min-width: 0; }
+.info-card, .ic-txt, .insta-card { min-width: 0; }
+
+/* mobile menu extra actions */
+.mm-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.4rem; }
+.mm-actions .btn { flex: 1 1 200px; justify-content: center; }
+
+/* touch screens: no sticky hover effects after a tap, no "drag me" hint */
+@media (hover: none) {
+  .drag-hint { display: none; }
+  .ex-card:hover, .index-card:hover, .assign:hover, .menu-card:hover, .polaroid:hover, .info-card:hover, a.info-card:hover,
+  .insta-card:hover, .next-page:hover, .stat-card:hover, .icon-btn:hover, .to-top:hover, .footer-cols a:hover, .socials a:hover { transform: rotate(var(--r, 0deg)) !important; }
+  .ex-card:active, .index-card:active, .assign:active, .polaroid:active, .next-page:active, .insta-card:active { transform: scale(.98) rotate(var(--r, 0deg)) !important; transition-duration: .1s; }
+  .btn:active, .icon-btn:active { transform: scale(.95); }
+}
+
+/* phones: gentler tilt so rotated cards never touch the screen edge */
+@media (max-width: 700px) {
+  .index-card, .assign, .menu-card { transform: rotate(calc(var(--r, 0deg) * .35)); }
+  .hero-sticky-l { left: 0; }
+  .mobile-menu a { font-size: 1.65rem; padding: .5rem 0; }
+  .mobile-menu a em { font-size: 1.15rem; }
+}
+
+/* tablets */
+@media (min-width: 701px) and (max-width: 1080px) {
+  .explore { grid-template-columns: repeat(3, 1fr); }
+  .hero-grid { gap: 2.5rem; }
+}
+
+/* landscape phones: short screens */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root { --nav-h: 56px; }
+  .hero { min-height: auto; padding: calc(var(--nav-h) + 1.5rem) 0 2.5rem; }
+  .hero-grid { grid-template-columns: 1.2fr 1fr; gap: 1.5rem; }
+  .hero-art { height: 340px; }
+  .scroll-hint { display: none; }
+  .mobile-menu a { font-size: 1.5rem; padding: .45rem 0; }
+  .mm-inner { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+  .mm-actions, .mm-socials { grid-column: 1 / -1; }
+  .doodle-wrap { height: 260px; }
+  .lightbox img, #lb-img { max-height: 70vh; }
+}
+
+/* small phones (≤ 400px) */
+@media (max-width: 400px) {
+  .container { width: min(100% - 1.75rem, var(--container)); }
+  .logo { font-size: 1.25rem; }
+  .nav-actions { gap: .3rem; }
+  .icon-btn, .kbd-btn { width: 38px; height: 38px; border-radius: 10px; }
+  .page-title, .page-head h1 { font-size: clamp(2rem, 10.5vw, 2.6rem); }
+  .hero-name { font-size: clamp(3.4rem, 19vw, 4.6rem); }
+  .ex-card { min-height: 0; }
+  .ex-card h3 { font-size: 1.45rem; }
+  .ex-card p { font-size: 1.15rem; }
+  .info-card { padding: .95rem 1rem; gap: .8rem; }
+  .info-card b, .info-card .ic-txt a { font-size: .92rem; }
+  .ii { width: 40px; height: 40px; }
+  .notebook { padding-left: 3rem; padding-right: 1rem; }
+  .report { padding: 1.2rem .8rem; }
+  .rp-school b { font-size: 1.25rem; }
+  .rp-table th:nth-child(1) { width: 46%; }
+  .mbar { width: 64px; }
+  .hero-stats { gap: 1rem; }
+  .pola-wall { gap: 1.1rem .8rem; }
+}
+
+/* tiny phones (≤ 360px): teacher button moves into the menu, stickies go single column */
+@media (max-width: 360px) {
+  #teacher-btn { display: none; }
+  .explore { grid-template-columns: 1fr; }
+  .tool { padding-inline: .55rem; }
+}
+
+/* big screens */
+@media (min-width: 1600px) {
+  :root { --container: 1320px; }
+  html { font-size: calc(var(--fs) * 1.06); }
 }
